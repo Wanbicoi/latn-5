@@ -10,11 +10,13 @@ SELECT
     p.created_by,
     p.created_at,
     p.updated_at,
+    w.id AS workflow_id,
     w.name AS workflow_name,
     w.description AS workflow_description,
     w.is_active AS workflow_is_active,
     w.created_by AS workflow_created_by,
     w.created_at AS workflow_created_at,
+    w.graph_data,
     COALESCE(
         ARRAY_AGG(t.id) FILTER (
             WHERE
@@ -34,6 +36,7 @@ GROUP BY
     p.created_by,
     p.created_at,
     p.updated_at,
+    w.id,
     w.name,
     w.description,
     w.is_active,

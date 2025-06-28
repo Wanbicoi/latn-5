@@ -167,6 +167,7 @@ CREATE TABLE public_v2._workflows (
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     updated_at timestamp with time zone NOT NULL DEFAULT NOW(),
     project_id UUID,
+    graph_data JSONB,
     CONSTRAINT _workflows_pkey PRIMARY KEY (id),
     CONSTRAINT _workflows_created_by_fkey FOREIGN KEY (created_by) REFERENCES public_v2._users (id),
     CONSTRAINT _workflows_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id)

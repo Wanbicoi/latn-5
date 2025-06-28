@@ -8,6 +8,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  */
 const rpcMap: Record<string, string> = {
   projects: "projects_create",
+  workflows: "workflows_update",
   // Add more mappings as needed, e.g.:
   // task: "task_create",
   // tasks: "task_create",
@@ -133,7 +134,10 @@ export const dataProvider = (
 
       const rpcFn = rpcMap[resource]?.replace("_create", "_update");
       if (rpcFn) {
-        const { data, error } = await supabaseClient.rpc(rpcFn, { id, ...variables });
+        const { data, error } = await supabaseClient.rpc(rpcFn, {
+          id,
+          ...variables,
+        });
         if (error) {
           return handleError(error);
         }
@@ -165,7 +169,9 @@ export const dataProvider = (
     updateMany: async ({ resource, ids, variables, meta }) => {
       const response = await Promise.all(
         ids.map(async (id) => {
-          const tableName = meta?.schema ? `${meta.schema}.${resource}` : resource;
+          const tableName = meta?.schema
+            ? `${meta.schema}.${resource}`
+            : resource;
           const query = supabaseClient.from(tableName).update(variables);
 
           if (meta?.idColumnName) {
@@ -245,7 +251,9 @@ export const dataProvider = (
     deleteMany: async ({ resource, ids, meta }) => {
       const response = await Promise.all(
         ids.map(async (id) => {
-          const tableName = meta?.schema ? `${meta.schema}.${resource}` : resource;
+          const tableName = meta?.schema
+            ? `${meta.schema}.${resource}`
+            : resource;
           const query = supabaseClient.from(tableName).delete();
 
           if (meta?.idColumnName) {
@@ -272,8 +280,10 @@ export const dataProvider = (
       throw Error("Not implemented on refine-supabase data provider.");
     },
 
-    custom: () => {
-      throw Error("Not implemented on refine-supabase data provider.");
+    custom: async ({ url, payload }) => {
+      const { data, error } = await supabaseClient.rpc(url, payload);
+      if (error) return handleError(error);
+      return { data };
     },
   };
 };
