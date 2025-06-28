@@ -1,8 +1,14 @@
 // StartNode: entry node for selected data to be annotated
+import { useOhifViewer } from "@/contexts/ohif-viewer";
+import {
+  EyeOutlined,
+  PlayCircleOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import { useList } from "@refinedev/core";
+import { Button, Card, Form, Modal, Table, TableProps, Tooltip } from "antd";
 import React, { useState } from "react";
 import { Handle, Position } from "reactflow";
-import { PlayCircleOutlined, SettingOutlined } from "@ant-design/icons";
-import { Card, Modal, Form, Input } from "antd";
 
 type StartNodeProps = {
   id: string;
@@ -33,6 +39,11 @@ export const StartNode: React.FC<StartNodeProps> = ({ id, data, selected }) => {
     });
   };
 
+  const { data: orthancResourceData } = useList({
+    resource: "resources",
+  });
+  const { setSelectedTask } = useOhifViewer();
+
   return (
     <Card
       size="small"
@@ -58,6 +69,8 @@ export const StartNode: React.FC<StartNodeProps> = ({ id, data, selected }) => {
       </div>
       <Handle type="source" position={Position.Right} />
       <Modal
+        width={900}
+        height={600}
         open={modalOpen}
         title="Configure Start Stage"
         onCancel={() => setModalOpen(false)}
@@ -74,18 +87,67 @@ export const StartNode: React.FC<StartNodeProps> = ({ id, data, selected }) => {
             description: data.description || "",
           }}
         >
-          <Form.Item
-            label="Stage Name"
-            name="name"
-            rules={[{ required: true, message: "Please enter a name" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item label="Description" name="description">
-            <Input.TextArea rows={2} />
+          <Form.Item name={["resources"]} label="Select data for the workflow">
+            <FormItemTable
+              size="small"
+              dataSource={orthancResourceData?.data}
+              rowKey={"StudyInstanceUID"}
+              expandable={{
+                expandedRowRender: (record) =>
+                  record.RequestedProcedureDescription,
+              }}
+            >
+              <Table.Column dataIndex="PatientID" title="Patient ID" />
+              <Table.Column dataIndex="PatientName" title="Patient Name" />
+              <Table.Column dataIndex="PatientSex" title="Sex" width={60} />
+              <Table.Column dataIndex="AccessionNumber" title="Accession #" />
+              <Table.Column
+                dataIndex="ReferringPhysicianName"
+                title="Referring Physician"
+              />
+              <Table.Column
+                width={30}
+                dataIndex="StudyInstanceUID"
+                render={(StudyInstanceUID) => (
+                  <Tooltip title="Preview" placement="right">
+                    <Button
+                      type="link"
+                      icon={<EyeOutlined />}
+                      onClick={() => setSelectedTask({ StudyInstanceUID })}
+                    />
+                  </Tooltip>
+                )}
+              />
+            </FormItemTable>
           </Form.Item>
         </Form>
       </Modal>
     </Card>
+  );
+};
+
+type FormItemTableProps = TableProps & {
+  value?: string[]; // selected keys
+  onChange?: (selectedKeys: string[]) => void;
+};
+
+const FormItemTable: React.FC<FormItemTableProps> = ({
+  value = [],
+  onChange,
+  ...props
+}) => {
+  return (
+    <Table
+      {...props}
+      rowKey="id"
+      rowSelection={{
+        type: "checkbox",
+        selectedRowKeys: value,
+        onChange: (selectedRowKeys: React.Key[]) => {
+          onChange?.(selectedRowKeys as string[]);
+        },
+      }}
+      // pagination={false}
+    />
   );
 };

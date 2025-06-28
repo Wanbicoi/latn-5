@@ -12,11 +12,8 @@ CREATE TABLE public_v2._data_items (
 
 CREATE TABLE public_v2._datasource_integrations (
     id UUID NOT NULL DEFAULT GEN_RANDOM_UUID(),
-    name CHARACTER VARYING NOT NULL,
-    type CHARACTER VARYING NOT NULL,
-    config JSONB NOT NULL,
-    last_sync_status CHARACTER VARYING,
-    last_synced_at timestamp with time zone,
+    orthanc_uuid UUID NOT NULL,
+    data JSONB NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     CONSTRAINT _datasource_integrations_pkey PRIMARY KEY (id)
 );
@@ -49,9 +46,9 @@ CREATE TABLE public_v2._project_members (
     role_id UUID NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     CONSTRAINT _project_members_pkey PRIMARY KEY (project_id, user_id),
-    CONSTRAINT _project_members_user_id_fkey FOREIGN KEY (user_id) REFERENCES public_v2._users (id),
     CONSTRAINT _project_members_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id),
-    CONSTRAINT _project_members_role_id_fkey FOREIGN KEY (role_id) REFERENCES public_v2._roles (id)
+    CONSTRAINT _project_members_role_id_fkey FOREIGN KEY (role_id) REFERENCES public_v2._roles (id),
+    CONSTRAINT _project_members_user_id_fkey FOREIGN KEY (user_id) REFERENCES public_v2._users (id)
 );
 
 CREATE TABLE public_v2._project_tags (
@@ -92,8 +89,8 @@ CREATE TABLE public_v2._role_resources (
     role_id UUID NOT NULL,
     resource_id UUID NOT NULL,
     CONSTRAINT _role_resources_pkey PRIMARY KEY (role_id, resource_id),
-    CONSTRAINT _role_resources_role_id_fkey FOREIGN KEY (role_id) REFERENCES public_v2._roles (id),
-    CONSTRAINT _role_resources_resource_id_fkey FOREIGN KEY (resource_id) REFERENCES public_v2._resources (id)
+    CONSTRAINT _role_resources_resource_id_fkey FOREIGN KEY (resource_id) REFERENCES public_v2._resources (id),
+    CONSTRAINT _role_resources_role_id_fkey FOREIGN KEY (role_id) REFERENCES public_v2._roles (id)
 );
 
 CREATE TABLE public_v2._roles (
@@ -128,9 +125,9 @@ CREATE TABLE public_v2._tasks (
     completed_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     CONSTRAINT _tasks_pkey PRIMARY KEY (id),
-    CONSTRAINT _tasks_data_item_id_fkey FOREIGN KEY (data_item_id) REFERENCES public_v2._data_items (id),
-    CONSTRAINT _tasks_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id),
-    CONSTRAINT _tasks_current_stage_id_fkey FOREIGN KEY (current_stage_id) REFERENCES public_v2._workflow_stages (id)
+    CONSTRAINT _tasks_current_stage_id_fkey FOREIGN KEY (current_stage_id) REFERENCES public_v2._workflow_stages (id),
+    CONSTRAINT _tasks_data_item_id_fkey FOREIGN KEY (data_item_id) REFERENCES public_v2._datasource_integrations (id),
+    CONSTRAINT _tasks_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id)
 );
 
 CREATE TABLE public_v2._users (
@@ -145,17 +142,17 @@ CREATE TABLE public_v2._users (
 
 CREATE TABLE public_v2._workflow_stages (
     id UUID NOT NULL DEFAULT GEN_RANDOM_UUID(),
-    workflow_id UUID NOT NULL,
+    workflow_id UUID,
     name CHARACTER VARYING NOT NULL,
     description TEXT,
-    public.stage_type NOT NULL,
+    type USER - DEFINED NOT NULL,
     config JSONB NOT NULL DEFAULT '{}'::JSONB,
     on_success_stage_id UUID,
     on_failure_stage_id UUID,
     CONSTRAINT _workflow_stages_pkey PRIMARY KEY (id),
-    CONSTRAINT _workflow_stages_workflow_id_fkey FOREIGN KEY (workflow_id) REFERENCES public_v2._workflows (id),
+    CONSTRAINT _workflow_stages_on_failure_stage_id_fkey FOREIGN KEY (on_failure_stage_id) REFERENCES public_v2._workflow_stages (id),
     CONSTRAINT _workflow_stages_on_success_stage_id_fkey FOREIGN KEY (on_success_stage_id) REFERENCES public_v2._workflow_stages (id),
-    CONSTRAINT _workflow_stages_on_failure_stage_id_fkey FOREIGN KEY (on_failure_stage_id) REFERENCES public_v2._workflow_stages (id)
+    CONSTRAINT _workflow_stages_workflow_id_fkey FOREIGN KEY (workflow_id) REFERENCES public_v2._workflows (id)
 );
 
 CREATE TABLE public_v2._workflows (
@@ -167,8 +164,8 @@ CREATE TABLE public_v2._workflows (
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     updated_at timestamp with time zone NOT NULL DEFAULT NOW(),
     project_id UUID,
-    graph_data JSONB,
+    graph_data JSONB NOT NULL DEFAULT '{"edges": [], "nodes": [{"id": "44419dbe-79f4-4722-a314-31633f73b415", "data": {"label": "START"}, "type": "START", "width": 180, "height": 89, "dragging": false, "position": {"x": 2, "y": 42}, "selected": false, "positionAbsolute": {"x": 2, "y": 42}}, {"id": "68faa5f5-c8ba-4ee1-9b8c-514870322dd6", "data": {"label": "SUCCESS"}, "type": "SUCCESS", "width": 160, "height": 93, "dragging": false, "position": {"x": 237, "y": 74}, "selected": false, "positionAbsolute": {"x": 237, "y": 74}}]}'::JSONB,
     CONSTRAINT _workflows_pkey PRIMARY KEY (id),
-    CONSTRAINT _workflows_created_by_fkey FOREIGN KEY (created_by) REFERENCES public_v2._users (id),
-    CONSTRAINT _workflows_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id)
+    CONSTRAINT _workflows_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id),
+    CONSTRAINT _workflows_created_by_fkey FOREIGN KEY (created_by) REFERENCES public_v2._users (id)
 );

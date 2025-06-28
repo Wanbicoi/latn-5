@@ -27,7 +27,7 @@ function OnDeletedStudy(studyId)
   print(">>> OnDeletedStudy triggered: " .. studyId)
 
   HttpDelete(
-    "https://bmeemseeqpnsqgwdpcoj.supabase.co/rest/v1/public_v2.hd_orthanc_resources?uuid=eq." .. studyId,
+    "https://bmeemseeqpnsqgwdpcoj.supabase.co/rest/v1/public_v2._datasource_integrations?uuid=eq." .. studyId,
     {
       ["Content-Type"] = "application/json",
       ["apikey"] = "",
