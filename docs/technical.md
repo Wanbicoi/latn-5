@@ -74,6 +74,18 @@ This document outlines the technical details, dependencies, and constraints for 
     - All core tables should be prefixed with an underscore (e.g., `_projects`).
     - Business logic should interact with Postgres `views` (e.g., `projects`), which can join multiple core tables as needed.
 - **API Communication**: Direct communication with external services (e.g., for MITL) should be handled with care, including implementing retry mechanisms and fallback stages.
+- **RPC Function Mapping**: For advanced actions requiring SQL functions, resource names in [`src/providers/supabase/data-provider/index.ts:5`](src/providers/supabase/data-provider/index.ts:5) are mapped to corresponding RPC function names. This is used for complex operations while the data provider still follows standard Refine conventions for typical CRUD operations.
+  ```typescript
+  /**
+   * Map resource names to their corresponding RPC function names.
+   * Add more mappings as needed.
+   */
+  const rpcMap: Record<string, string> = {
+    projects: "projects_create",
+    // Add more mappings as needed, e.g.:
+    // tasks: "tasks_create",
+  };
+  ```
 
 ## 4. Dependencies
 

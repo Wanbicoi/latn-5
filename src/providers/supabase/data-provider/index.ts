@@ -7,8 +7,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * Add more mappings as needed.
  */
 const rpcMap: Record<string, string> = {
-  project: "project_create",
-  projects: "project_create",
+  projects: "projects_create",
   // Add more mappings as needed, e.g.:
   // task: "task_create",
   // tasks: "task_create",
