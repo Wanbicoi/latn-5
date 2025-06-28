@@ -41,7 +41,7 @@ export const accessControlProvider = (): Required<IAccessControlContext> => {
     },
     options: {
       buttons: {
-        hideIfUnauthorized: true,
+        hideIfUnauthorized: false,
       },
     },
   };

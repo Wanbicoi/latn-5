@@ -10,13 +10,11 @@ import { BaseRecord } from "@refinedev/core";
 import { Space, Table, Tag } from "antd";
 
 export const ProjectsList = () => {
-  const { tableProps, tableQuery } = useTable({
-    syncWithLocation: true,
-  });
+  const { tableProps } = useTable();
 
   return (
     <List title="Projects">
-      <Table {...tableProps}>
+      <Table {...tableProps} rowKey="id">
         <Table.Column dataIndex="id" title="Id" />
         <Table.Column dataIndex="name" title="Name" />
         <Table.Column
@@ -41,16 +39,9 @@ export const ProjectsList = () => {
           dataIndex="actions"
           render={(_, record: BaseRecord) => (
             <Space>
-              <ShowButton size="small" recordItemId={record.id}>
-                Show tasks
-              </ShowButton>
+              <ShowButton size="small" recordItemId={record.id} />
               <EditButton hideText size="small" recordItemId={record.id} />
-              <DeleteButton
-                hideText
-                size="small"
-                recordItemId={record.id}
-                onSuccess={() => tableQuery.refetch()}
-              />
+              <DeleteButton hideText size="small" recordItemId={record.id} />
             </Space>
           )}
         />

@@ -1,53 +1,25 @@
-import FormItemTable from "@/components/form-item/table";
-import { getColorOptions } from "@/utils/colors";
-import { useOhifViewer } from "@/contexts/ohif-viewer";
-import { CloseOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import { Create, Edit, useForm, useSelect } from "@refinedev/antd";
-import { useCustomMutation, useList, useParsed } from "@refinedev/core";
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  Select,
-  Table,
-  Tooltip,
-  Space,
-  Tag,
-} from "antd";
+import { useParsed } from "@refinedev/core";
+import { Form, Input, Select, Tag } from "antd";
 import { useNavigate } from "react-router";
 
 export const ProjectsCreate = ({ isEdit }: { isEdit?: boolean }) => {
-  const { mutate } = useCustomMutation({});
-
   const navigate = useNavigate(); // Initialize useNavigate
   const { id } = useParsed();
-  const { formProps, saveButtonProps } = useForm({
-    resource: "hd_project_show",
+  const { formProps, saveButtonProps, onFinish } = useForm({
+    resource: "projects",
     id,
     action: isEdit ? "edit" : "create",
+    onMutationSuccess: () => {
+      navigate("/projects");
+    },
   });
 
-  const handleFinish = (values: any) => {
-    mutate(
-      {
-        url: "hd_create_project",
-        method: "post",
-        values: {
-          name: values.name,
-          batches: values.batches ?? [],
-          project_id: id,
-          tags: values.tags ?? [],
-        },
-        successNotification: {
-          message: isEdit ? "Updated!" : "Created!",
-          type: "success",
-        },
-      },
-      {
-        onSuccess: () => navigate("/projects"),
-      }
-    );
+  const handleFinish = async (values: any) => {
+    await onFinish({
+      ...values,
+      tags: values.tags ?? [],
+    });
   };
 
   const ProjectForm = () => (
@@ -57,11 +29,10 @@ export const ProjectsCreate = ({ isEdit }: { isEdit?: boolean }) => {
       labelCol={{ span: 4 }}
       wrapperCol={{ span: 18 }}
     >
-      <Form.Item
-        label="Project title"
-        name={["name"]}
-        rules={[{ required: true }]}
-      >
+      <Form.Item label="Name" name={["name"]} rules={[{ required: true }]}>
+        <Input />
+      </Form.Item>
+      <Form.Item label="Description" name={["description"]}>
         <Input />
       </Form.Item>
       <Form.Item
@@ -74,7 +45,6 @@ export const ProjectsCreate = ({ isEdit }: { isEdit?: boolean }) => {
       >
         <TagsSelect />
       </Form.Item>
-      <Batches />
     </Form>
   );
 
@@ -89,138 +59,12 @@ export const ProjectsCreate = ({ isEdit }: { isEdit?: boolean }) => {
   );
 };
 
-function Batches() {
-  const { selectProps: selectAssigneesProps } = useSelect({
-    resource: "hd_profile_list",
-    optionValue: "id",
-    optionLabel: (item: {
-      id: string;
-      last_name: string;
-      first_name: string;
-      role: string;
-    }) =>
-      `${item.first_name} ${item.last_name} - ${capitalizeFirstCharRegex(
-        item.role
-      )}`,
-  });
-  const { data: orthancResourceData } = useList({
-    resource: "hd_orthanc_resources_list",
-  });
-  const { setSelectedTask } = useOhifViewer();
-
-  return (
-    <Form.List name="batches">
-      {(fields, { add, remove }, { errors }) => (
-        <>
-          {fields.map((field) => (
-            <Card
-              size="small"
-              title={`Batch ${field.name + 1}`}
-              key={field.key}
-              extra={<CloseOutlined onClick={() => remove(field.name)} />}
-              style={{ marginBottom: 16 }}
-            >
-              <Form.Item
-                {...field}
-                label="Title"
-                name={[field.name, "title"]}
-                rules={[
-                  {
-                    required: true,
-                    message:
-                      "Please input passenger's name or delete this field.",
-                  },
-                ]}
-              >
-                <Input placeholder="Title" style={{ width: "60%" }} />
-              </Form.Item>
-              <Form.Item
-                {...field}
-                name={[field.name, "resources"]}
-                label="CTs"
-              >
-                <FormItemTable
-                  size="small"
-                  dataSource={orthancResourceData?.data}
-                  rowKey={"StudyInstanceUID"}
-                  expandable={{
-                    expandedRowRender: (record) =>
-                      record.RequestedProcedureDescription,
-                  }}
-                >
-                  <Table.Column dataIndex="PatientID" title="Patient ID" />
-                  <Table.Column dataIndex="PatientName" title="Patient Name" />
-                  <Table.Column dataIndex="PatientSex" title="Sex" width={60} />
-                  <Table.Column
-                    dataIndex="AccessionNumber"
-                    title="Accession #"
-                  />
-                  <Table.Column
-                    dataIndex="ReferringPhysicianName"
-                    title="Referring Physician"
-                  />
-                  <Table.Column
-                    width={30}
-                    dataIndex="StudyInstanceUID"
-                    render={(StudyInstanceUID) => (
-                      <Tooltip title="Preview" placement="right">
-                        <Button
-                          type="link"
-                          icon={<EyeOutlined />}
-                          onClick={() => setSelectedTask({ StudyInstanceUID })}
-                        />
-                      </Tooltip>
-                    )}
-                  />
-                </FormItemTable>
-              </Form.Item>
-              <Form.Item
-                {...field}
-                name={[field.name, "assignees"]}
-                label="Assignees"
-              >
-                <Select
-                  {...selectAssigneesProps}
-                  onSearch={undefined}
-                  optionFilterProp="label"
-                  filterOption={true}
-                  mode="multiple"
-                  placeholder="Assignees"
-                  style={{ width: "60%" }}
-                />
-              </Form.Item>
-            </Card>
-          ))}
-          <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-            <Button
-              type="dashed"
-              onClick={() => add()}
-              style={{ width: "60%" }}
-              icon={<PlusOutlined />}
-            >
-              Add batch
-            </Button>
-            <Form.ErrorList errors={errors} />
-          </Form.Item>
-        </>
-      )}
-    </Form.List>
-  );
-}
-
-function capitalizeFirstCharRegex(str: string) {
-  if (typeof str !== "string" || str.length === 0) {
-    return str;
-  }
-  return str.replace(/^./, str[0].toUpperCase());
-}
-
 function TagsSelect(props: any) {
   const { selectProps: selectTagsProps, query } = useSelect({
-    resource: "hd_tags",
+    resource: "project_tags",
   });
   const options = query.data?.data.map((item) => ({
-    label: item.title,
+    label: item.name,
     value: item.id,
   }));
 
