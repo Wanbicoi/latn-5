@@ -1,26 +1,20 @@
-// ReviewNode with configuration UI and dual output handles
+// StartNode: entry node for selected data to be annotated
 import React, { useState } from "react";
 import { Handle, Position } from "reactflow";
-import { EyeOutlined, SettingOutlined } from "@ant-design/icons";
-import { Card, Modal, Form, Input, Button } from "antd";
+import { PlayCircleOutlined, SettingOutlined } from "@ant-design/icons";
+import { Card, Modal, Form, Input } from "antd";
 
-type ReviewNodeProps = {
+type StartNodeProps = {
   id: string;
   data: {
     name?: string;
     description?: string;
-    on_success_stage_id?: string;
-    on_failure_stage_id?: string;
     onChange?: (data: any) => void;
   };
   selected: boolean;
 };
 
-export const ReviewNode: React.FC<ReviewNodeProps> = ({
-  id,
-  data,
-  selected,
-}) => {
+export const StartNode: React.FC<StartNodeProps> = ({ id, data, selected }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = Form.useForm();
 
@@ -43,17 +37,17 @@ export const ReviewNode: React.FC<ReviewNodeProps> = ({
     <Card
       size="small"
       style={{
-        border: "2px solid #52c41a",
-        background: "#f6ffed",
+        border: "2px solid #52a2ff",
+        background: "#e6f0ff",
         minWidth: 180,
         textAlign: "center",
-        boxShadow: selected ? "0 0 0 2px #52c41a" : undefined,
+        boxShadow: selected ? "0 0 0 2px #52a2ff" : undefined,
       }}
       bodyStyle={{ padding: 12, position: "relative" }}
     >
-      <EyeOutlined style={{ fontSize: 24, color: "#52c41a" }} />
+      <PlayCircleOutlined style={{ fontSize: 24, color: "#52a2ff" }} />
       <div style={{ fontWeight: 600, marginTop: 8 }}>
-        {data.name || "Review"}
+        {data.name || "Start"}
         <SettingOutlined
           style={{ marginLeft: 8, cursor: "pointer", fontSize: 16 }}
           onClick={handleOpen}
@@ -62,30 +56,10 @@ export const ReviewNode: React.FC<ReviewNodeProps> = ({
       <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
         {data.description}
       </div>
-      <Handle type="target" position={Position.Left} />
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="approve"
-        style={{ top: "30%", background: "#52c41a" }}
-      >
-        <div style={{ fontSize: 10, color: "#52c41a", marginLeft: 18 }}>
-          Approve
-        </div>
-      </Handle>
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="reject"
-        style={{ top: "70%", background: "#ff4d4f" }}
-      >
-        <div style={{ fontSize: 10, color: "#ff4d4f", marginLeft: 18 }}>
-          Reject
-        </div>
-      </Handle>
+      <Handle type="source" position={Position.Right} />
       <Modal
         open={modalOpen}
-        title="Configure Review Stage"
+        title="Configure Start Stage"
         onCancel={() => setModalOpen(false)}
         onOk={handleSave}
         okText="Save"

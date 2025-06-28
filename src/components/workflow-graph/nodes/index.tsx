@@ -6,6 +6,7 @@ import { RouterNode } from "./router-node";
 import { DatasourceNode } from "./datasource-node";
 import { SuccessNode } from "./success-node";
 import { ArchivedNode } from "./archived-node";
+import { StartNode } from "./start-node";
 import {
   EditOutlined,
   EyeOutlined,
@@ -15,9 +16,11 @@ import {
   DatabaseOutlined,
   CheckCircleTwoTone,
   InboxOutlined,
+  PlayCircleOutlined,
 } from "@ant-design/icons";
 
 export const nodeTypes = {
+  START: StartNode,
   ANNOTATE: AnnotateNode,
   REVIEW: ReviewNode,
   CONSENSUS: ConsensusNode,
@@ -32,6 +35,10 @@ export const NODE_TYPE_META: Record<
   keyof typeof nodeTypes,
   { label: string; icon: React.ReactNode }
 > = {
+  START: {
+    label: "Start",
+    icon: <PlayCircleOutlined style={{ color: "#52a2ff" }} />,
+  },
   ANNOTATE: {
     label: "Annotate",
     icon: <EditOutlined style={{ color: "#1890ff" }} />,

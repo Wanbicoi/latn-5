@@ -35,7 +35,7 @@ export function ProjectsShow() {
       url: "workflows_update",
       method: "post",
       values: {
-        workflow_id: project.workflow_id,
+        p_workflow_id: project.workflow_id,
         nodes,
         edges,
       },

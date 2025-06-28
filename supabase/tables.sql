@@ -148,7 +148,7 @@ CREATE TABLE public_v2._workflow_stages (
     workflow_id UUID NOT NULL,
     name CHARACTER VARYING NOT NULL,
     description TEXT,
-    type USER - DEFINED NOT NULL,
+    public.stage_type NOT NULL,
     config JSONB NOT NULL DEFAULT '{}'::JSONB,
     on_success_stage_id UUID,
     on_failure_stage_id UUID,
