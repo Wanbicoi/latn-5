@@ -54,10 +54,10 @@ export function ProjectsShow() {
       setNodes([]);
       setEdges([]);
     }
-  }, [project, setNodes, setEdges]);
+  }, [query.dataUpdatedAt, setNodes, setEdges]);
 
   return (
-    <Show>
+    <Show isLoading={query?.isLoading}>
       <div style={{ marginBottom: 16 }}>
         <h3>Workflow Details</h3>
         <div>
