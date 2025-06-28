@@ -67,8 +67,8 @@ export const ConsensusNode: React.FC<ConsensusNodeProps> = ({
       <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
         {data.description}
       </div>
-      <Handle type="target" position={Position.Top} />
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="target" position={Position.Left} />
+      <Handle type="source" position={Position.Right} />
       <Modal
         open={modalOpen}
         title="Configure Consensus Stage"

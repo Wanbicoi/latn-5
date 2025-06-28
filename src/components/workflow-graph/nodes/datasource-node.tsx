@@ -60,7 +60,7 @@ export const DatasourceNode: React.FC<DatasourceNodeProps> = ({
       <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
         {data.description}
       </div>
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="source" position={Position.Right} />
       <Modal
         open={modalOpen}
         title="Configure Datasource Stage"

@@ -35,6 +35,6 @@ export const ArchivedNode: React.FC<ArchivedNodeProps> = ({
     <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
       {data.description}
     </div>
-    <Handle type="target" position={Position.Top} />
+    <Handle type="target" position={Position.Left} />
   </Card>
 );

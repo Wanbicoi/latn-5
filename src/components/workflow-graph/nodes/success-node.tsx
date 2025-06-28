@@ -32,6 +32,6 @@ export const SuccessNode: React.FC<SuccessNodeProps> = ({ data, selected }) => (
     <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
       {data.description}
     </div>
-    <Handle type="target" position={Position.Top} />
+    <Handle type="target" position={Position.Left} />
   </Card>
 );

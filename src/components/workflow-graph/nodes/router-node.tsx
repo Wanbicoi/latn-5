@@ -75,19 +75,19 @@ export const RouterNode: React.FC<RouterNodeProps> = ({
       <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
         {data.description}
       </div>
-      <Handle type="target" position={Position.Top} />
+      <Handle type="target" position={Position.Left} />
       {rules.map((rule, idx) => (
         <Handle
           key={idx}
           type="source"
-          position={Position.Bottom}
+          position={Position.Right}
           id={`rule-${idx}`}
           style={{
-            left: `${(100 / (rules.length + 1)) * (idx + 1)}%`,
+            top: `${(100 / (rules.length + 1)) * (idx + 1)}%`,
             background: "#d4380d",
           }}
         >
-          <div style={{ fontSize: 10, color: "#d4380d", marginTop: 18 }}>
+          <div style={{ fontSize: 10, color: "#d4380d", marginLeft: 18 }}>
             {rule.condition ? rule.condition : `Rule ${idx + 1}`}
           </div>
         </Handle>
