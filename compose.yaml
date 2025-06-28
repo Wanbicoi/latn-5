@@ -1,0 +1,78 @@
+# docker-compose.yaml
+# version: '3.8' # Specify the Compose file format version
+
+services:
+  # --- Orthanc Service ---
+  orthanc:
+    image: orthancteam/orthanc:lastest # Use the official Orthanc Docker image
+    container_name: orthanc
+    ports:
+      - "8042:8042" # Map Orthanc's HTTP port (for API and web UI)
+      # You can optionally map the DICOM port if needed externally, but often not required for OHIF
+      # - "4242:4242" # Map Orthanc's DICOM port
+    # volumes:
+    #   # Persist Orthanc data (DICOM files, database) to a named volume
+    #   - orthanc_data:/dicom
+      # Optional: Mount custom Orthanc configuration if needed
+      # - ./orthanc-config:/etc/orthanc
+    secrets:
+      - orthanc.secret.json
+    # networks:
+    #   - medical-imaging-network # Connect Orthanc to a custom network for services
+
+  # --- OHIF Viewer Service ---
+  ohif:
+    image: ohif/app:3.9.3 # Use a commonly available OHIF Viewer image
+    container_name: ohif-viewer
+    ports:
+      - "3000:80" # Map host port 3000 to OHIF's internal web server port (usually 80)
+    environment:
+      # **CRITICAL:** Configure OHIF to point to Orthanc.
+      # The exact environment variable(s) needed here DEPEND on the specific OHIF image
+      # you are using. You might need to consult the image's documentation.
+      # This is a common pattern, but may need adjustment.
+      # We use the service name 'orthanc' and its internal HTTP port 8042.
+      # You might need to set variables related to DICOMWeb, WADO-RS, QIDO-RS endpoints.
+      # Example (may need modification based on OHIF image):
+      - APP_CONFIG_ORTHANC_URL=http://orthanc:8042
+      # Some images might expect a full DICOMWeb URL like:
+      # - REACT_APP_DCM4CHEE_ARC_URL=http://orthanc:8042/dicom-web # Check Orthanc config for /dicom-web
+    depends_on:
+      - orthanc # Ensure Orthanc starts before OHIF
+    # networks:
+    #   - medical-imaging-network # Connect OHIF to the same network as Orthanc
+
+  # --- Refine.dev App Service ---
+  refine-app:
+    build:
+      context: . # Look for the Dockerfile in the current directory
+    container_name: refine-app
+    ports:
+      - "80:3000" # Map host port 80 (standard HTTP) to your refine app's internal port (EXPOSEd in Dockerfile)
+    # volumes:
+      # Optional: Mount your code for live development (requires nodding setup and potentially different Dockerfile)
+      # - .:/app
+      # - /app/node_modules # Prevent host node_modules from overwriting container's
+    # environment:
+      # Define any environment variables your refine app needs at runtime
+      # e.g., API keys, service URLs
+      # - NODE_ENV=production
+      # - YOUR_APP_VAR=value
+    # depends_on:
+    #   - ohif # Uncomment if your refine app strictly depends on OHIF being ready on startup
+    # networks:
+    #   - medical-imaging-network # Connect your app to the same network (if it needs to interact)
+      # Or connect to a separate network if it's completely independent
+
+secrets:
+  orthanc.secret.json:
+    file: orthanc.secret.json
+
+# Define named volumes for data persistence
+# volumes:
+  # orthanc_data:
+
+# Define custom network for inter-service communication
+# networks:
+#   medical-imaging-network:
+#     driver: bridge # Use the default bridge network driver
