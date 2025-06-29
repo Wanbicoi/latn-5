@@ -1,5 +1,4 @@
-import { BooleanField, DateField, Show } from "@refinedev/antd";
-import { useParsed, useShow } from "@refinedev/core";
+import { useOne, useParsed, useShow } from "@refinedev/core";
 import {
   Button,
   Table,
@@ -35,19 +34,13 @@ type Workflow = {
 };
 
 export function WorkflowTab() {
-  const { id } = useParsed();
-  const { query } = useShow<Project>({ resource: "projects", id });
-  const project = query?.data?.data;
+  const { id: project_id } = useParsed();
 
-  // Fetch workflow data from the workflows view
-  const { query: workflowQuery } = useShow<Workflow>({
+  const { data: workflowData } = useOne<Workflow>({
     resource: "workflows",
-    id: project?.workflow_id,
-    queryOptions: {
-      enabled: !!project?.workflow_id,
-    },
+    id: project_id,
   });
-  const workflow = workflowQuery?.data?.data;
+  const workflow = workflowData?.data;
 
   const {
     modalProps: dataModalProps,
@@ -100,7 +93,7 @@ export function WorkflowTab() {
         <Flex justify="space-between">
           <Button
             style={{ marginLeft: 8 }}
-            onClick={() => showDatasetsModal(project?.id)}
+            onClick={() => showDatasetsModal(project_id)}
           >
             Choose Data for Annotate
           </Button>
@@ -128,13 +121,12 @@ export function WorkflowTab() {
       <ChooseDataForAnnotate
         formProps={dataFormProps}
         dataModalProps={dataModalProps}
-        project={project}
       />
     </Space>
   );
 }
 
-function ChooseDataForAnnotate({ formProps, dataModalProps, project }: any) {
+function ChooseDataForAnnotate({ formProps, dataModalProps }: any) {
   const { data: orthancResourceData } = useList({ resource: "resources" });
 
   return (
