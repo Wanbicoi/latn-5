@@ -1,30 +1,53 @@
 import { BooleanField, DateField, Show } from "@refinedev/antd";
-import { useShow } from "@refinedev/core";
-
-import { WorkflowGraph } from "../../components/workflow-graph";
-import { Button, Table, Tooltip, Modal, TableProps, Form } from "antd";
+import { useParsed, useShow } from "@refinedev/core";
+import {
+  Button,
+  Table,
+  Tooltip,
+  Modal,
+  Form,
+  Space,
+  Flex,
+  Popconfirm,
+} from "antd";
 import { useCustomMutation, useList } from "@refinedev/core";
 import { useModalForm } from "@refinedev/antd";
 import { type Node, type Edge, useEdgesState, useNodesState } from "reactflow";
 import { useEffect } from "react";
 import { EyeOutlined } from "@ant-design/icons";
 import FormItemTable from "@/components/form-item/table";
+import WorkflowGraph from "@/components/workflow-graph";
 
 type Project = {
   id: string;
   name: string;
   workflow_id?: string;
-  workflow_name?: string;
-  workflow_description?: string;
-  workflow_is_active?: boolean;
-  workflow_created_by?: string;
-  workflow_created_at?: string;
+};
+
+type Workflow = {
+  id: string;
+  name: string;
+  description?: string;
+  is_active: boolean;
+  created_by?: string;
+  created_at?: string;
   graph_data?: { nodes: Node[]; edges: Edge[] } | null;
 };
 
-export function ProjectsShow() {
-  const { query } = useShow<Project>({});
+export function WorkflowTab() {
+  const { id } = useParsed();
+  const { query } = useShow<Project>({ resource: "projects", id });
   const project = query?.data?.data;
+
+  // Fetch workflow data from the workflows view
+  const { query: workflowQuery } = useShow<Workflow>({
+    resource: "workflows",
+    id: project?.workflow_id,
+    queryOptions: {
+      enabled: !!project?.workflow_id,
+    },
+  });
+  const workflow = workflowQuery?.data?.data;
 
   const {
     modalProps: dataModalProps,
@@ -35,6 +58,9 @@ export function ProjectsShow() {
     resource: "datasets",
   });
 
+  // Restrict workflow creation/saving to once per project
+  const hasWorkflow = false; // TODO: !!workflow?.id;
+
   // Editable workflow state
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -42,12 +68,12 @@ export function ProjectsShow() {
 
   // Save handler
   const handleSave = async () => {
-    if (!project?.workflow_id) return;
+    if (!workflow?.id) return;
     mutate({
       url: "workflows_update",
       method: "post",
       values: {
-        p_workflow_id: project.workflow_id,
+        p_workflow_id: workflow.id,
         nodes,
         edges,
       },
@@ -59,67 +85,52 @@ export function ProjectsShow() {
   };
 
   useEffect(() => {
-    if (project?.graph_data) {
-      setNodes(project.graph_data.nodes);
-      setEdges(project.graph_data.edges);
+    if (workflow?.graph_data) {
+      setNodes(workflow.graph_data.nodes);
+      setEdges(workflow.graph_data.edges);
     } else {
       setNodes([]);
       setEdges([]);
     }
-  }, [query.dataUpdatedAt, setNodes, setEdges]);
+  }, [workflow?.graph_data, setNodes, setEdges]);
 
   return (
-    <Show isLoading={query?.isLoading}>
-      <div style={{ marginBottom: 16 }}>
-        <h3>Workflow Details</h3>
-        <div>
-          <strong>Name:</strong> {project?.workflow_name || "-"}
-        </div>
-        <div>
-          <strong>Description:</strong> {project?.workflow_description || "-"}
-        </div>
-        <div>
-          <strong>Active:</strong>{" "}
-          <BooleanField value={project?.workflow_is_active} />
-        </div>
-        <div>
-          <strong>Created At:</strong>{" "}
-          {project?.workflow_created_at ? (
-            <DateField
-              value={project?.workflow_created_at}
-              format="YYYY-MM-DD HH:mm"
-            />
-          ) : (
-            "-"
-          )}
-        </div>
-      </div>
-      <Button type="primary" onClick={handleSave} loading={isLoading}>
-        Save Workflow
-      </Button>
-      <Button
-        style={{ marginLeft: 8 }}
-        onClick={() => showDatasetsModal(project?.id)}
-      >
-        Choose Data for Annotate
-      </Button>
+    <Space direction="vertical" style={{ width: "100%" }}>
+      {!hasWorkflow && (
+        <Flex justify="space-between">
+          <Button
+            style={{ marginLeft: 8 }}
+            onClick={() => showDatasetsModal(project?.id)}
+          >
+            Choose Data for Annotate
+          </Button>
+          <Popconfirm
+            placement="left"
+            title="Are you sure you want to delete this workflow?"
+            onConfirm={handleSave}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary">Create Workflow</Button>
+          </Popconfirm>
+        </Flex>
+      )}
       <WorkflowGraph
-        editable
+        editable={!hasWorkflow}
         nodes={nodes}
         edges={edges}
         setNodes={setNodes}
         setEdges={setEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        workflowId={project?.workflow_id}
+        workflowId={workflow?.id}
       />
-
       <ChooseDataForAnnotate
         formProps={dataFormProps}
         dataModalProps={dataModalProps}
         project={project}
       />
-    </Show>
+    </Space>
   );
 }
 
@@ -152,9 +163,6 @@ function ChooseDataForAnnotate({ formProps, dataModalProps, project }: any) {
               onChange: (selectedRowKeys) =>
                 formProps?.setFieldValue("resources", selectedRowKeys),
             }}
-            // expandable={{
-            //   expandedRowRender: (record) => record.RequestedProcedureDescription,
-            // }}
           >
             <Table.Column dataIndex="PatientID" title="Patient ID" />
             <Table.Column dataIndex="PatientName" title="Patient Name" />

@@ -67,5 +67,49 @@ BEGIN
     ) sub
     WHERE ws.id = sub.stage_id;
 
+    -- Set begin_stage_id in _workflows to the stage_id of the target of the START node's outgoing edge
+    DECLARE
+        start_node_id TEXT;
+        v_begin_stage_id UUID;
+    BEGIN
+        -- Find the START node's id
+        SELECT node->>'id' INTO start_node_id
+        FROM jsonb_array_elements(nodes) AS node
+        WHERE node->>'type' = 'START'
+        LIMIT 1;
+
+        -- Find the target node id of the START node's outgoing edge
+        IF start_node_id IS NOT NULL THEN
+            SELECT e->>'target'
+            INTO STRICT start_node_id
+            FROM jsonb_array_elements(edges) AS e
+            WHERE e->>'source' = start_node_id
+            LIMIT 1;
+
+            -- Find the stage_id for the target node
+            SELECT stage_id INTO v_begin_stage_id
+            FROM tmp_stage_ids
+            WHERE node_id = start_node_id;
+
+            -- Update the begin_stage_id in _workflows
+            UPDATE public_v2._workflows
+            SET begin_stage_id = v_begin_stage_id
+            WHERE id = p_workflow_id;
+        END IF;
+
+        -- Create task assignments for each assignee of the v_begin_stage_id
+        INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to, status)
+        SELECT *
+        FROM (
+            SELECT
+                t.id,
+                v_begin_stage_id,
+                assignee.user_id,
+                'PENDING'::public.assignment_status
+            FROM public_v2._tasks t
+            JOIN public_v2.get_workflow_stage_assignees(v_begin_stage_id) assignee
+                ON t.project_id = (SELECT project_id FROM public_v2._workflows WHERE id = p_workflow_id)
+        ) AS sub;
+    END;
 END;
 $$;

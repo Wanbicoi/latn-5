@@ -108,6 +108,7 @@ function App() {
                       <Route index element={<ProjectsList />} />
                       <Route path="create" element={<ProjectsCreate />} />
                       <Route path="show/:id" element={<ProjectsShow />} />
+                      <Route path="show/:id/:tab" element={<ProjectsShow />} />
                       <Route
                         path="edit/:id"
                         element={<ProjectsCreate isEdit />}
