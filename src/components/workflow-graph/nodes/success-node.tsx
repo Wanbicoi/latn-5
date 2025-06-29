@@ -9,6 +9,7 @@ type SuccessNodeProps = {
   data: {
     name?: string;
     description?: string;
+    workflow_id?: string;
   };
   selected: boolean;
 };

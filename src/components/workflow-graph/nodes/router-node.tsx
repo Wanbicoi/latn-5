@@ -21,6 +21,7 @@ type RouterNodeProps = {
     name?: string;
     description?: string;
     onChange?: (data: any) => void;
+    workflow_id?: string;
   };
   selected: boolean;
 };

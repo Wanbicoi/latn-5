@@ -12,6 +12,7 @@ type ReviewNodeProps = {
     on_success_stage_id?: string;
     on_failure_stage_id?: string;
     onChange?: (data: any) => void;
+    workflow_id?: string;
   };
   selected: boolean;
 };

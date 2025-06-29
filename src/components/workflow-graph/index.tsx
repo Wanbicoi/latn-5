@@ -24,6 +24,7 @@ type WorkflowGraphProps = {
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
+  workflowId?: string;
 };
 
 export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
@@ -34,6 +35,7 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   setEdges,
   onEdgesChange,
   onNodesChange,
+  workflowId,
 }) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
@@ -69,6 +71,15 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
 
   if (nodes.length === 0 && !editable)
     return <div>No stages found for this workflow.</div>;
+
+  // Inject workflow_id into each node's data
+  const nodesWithWorkflowId = nodes.map((node) => ({
+    ...node,
+    data: {
+      ...node.data,
+      workflow_id: workflowId,
+    },
+  }));
 
   return (
     <div style={{ width: "100%", height: 600, position: "relative" }}>
@@ -114,7 +125,7 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
         </div>
       )}
       <ReactFlow
-        nodes={nodes}
+        nodes={nodesWithWorkflowId}
         edges={edges}
         onEdgesChange={onEdgesChange}
         onNodesChange={onNodesChange}
