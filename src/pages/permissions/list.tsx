@@ -1,31 +1,25 @@
-// Permissions List Page (read-only)
 import { List } from "@refinedev/antd";
-import { Table, Tag } from "antd";
+import { Button, Table, Tag } from "antd";
 import { useTable } from "@refinedev/antd";
 
 import { useMemo } from "react";
-import {
-  CheckCircleFilled,
-  CheckCircleOutlined,
-  CheckCircleTwoTone,
-} from "@ant-design/icons";
-import { al } from "react-router/dist/development/route-data-5OzAzQtT";
+import { CheckCircleTwoTone, CloseCircleOutlined } from "@ant-design/icons";
+import { useCustomMutation, useInvalidate } from "@refinedev/core";
 
 export const PermissionsList = () => {
-  const { tableProps } = useTable({
+  const {
+    tableProps,
+    tableQuery: { isFetching },
+  } = useTable({
     resource: "permissions",
     syncWithLocation: false,
     pagination: {
-      pageSize: 1000,
+      mode: "off",
     },
   });
 
   const { dataSource = [] } = tableProps;
 
-  const roles = useMemo(
-    () => Array.from(new Set(dataSource.map((item: any) => item.role_name))),
-    [dataSource]
-  );
   const resources = useMemo(
     () => Array.from(new Set(dataSource.map((item: any) => item.resource))),
     [dataSource]
@@ -35,25 +29,37 @@ export const PermissionsList = () => {
     [dataSource]
   );
 
-  // Build matrix: resource + action -> role -> true/false
+  // Build matrix: resource + action -> role_id -> true/false
+  const roleIds = useMemo<string[]>(() => {
+    return Array.from(new Set(dataSource.map((item: any) => item.role_id)));
+  }, [dataSource]);
+
+  const roleIdNameMap = useMemo<Record<string, string>>(() => {
+    const map: Record<string, string> = {};
+    dataSource.forEach((item: any) => {
+      map[item.role_id] = item.role_name;
+    });
+    return map;
+  }, [dataSource]);
+
   const matrix = useMemo(() => {
     const map: Record<string, Record<string, boolean>> = {};
     resources.forEach((resource: string) => {
       actions.forEach((action: string) => {
         const key = `${resource}:${action}`;
         map[key] = {};
-        roles.forEach((role: string) => {
-          map[key][role] = dataSource.some(
+        roleIds.forEach((roleId: string) => {
+          map[key][roleId] = dataSource.some(
             (item: any) =>
               item.resource === resource &&
               item.action === action &&
-              item.role_name === role
+              item.role_id === roleId
           );
         });
       });
     });
     return map;
-  }, [dataSource, resources, actions, roles]);
+  }, [dataSource, resources, actions, roleIds]);
 
   // Calculate rowSpan for resource grouping
   const groupedData = dataSource
@@ -77,8 +83,8 @@ export const PermissionsList = () => {
   let resourceRowIndex: Record<string, number> = {};
   const data = groupedData.map((row: any, idx: number) => {
     const key = `${row.resource}:${row.action}`;
-    roles.forEach((role) => {
-      row[role] = matrix[key]?.[role] ?? false;
+    roleIds.forEach((roleId: string) => {
+      row[roleId] = matrix[key]?.[roleId] ?? false;
     });
     row.key = key;
     // Row span logic
@@ -90,6 +96,9 @@ export const PermissionsList = () => {
     }
     return row;
   });
+
+  const { mutate } = useCustomMutation({});
+  const invalidate = useInvalidate();
 
   const columns = [
     {
@@ -105,27 +114,63 @@ export const PermissionsList = () => {
     {
       title: "Action",
       dataIndex: "action",
+      width: 150,
       fixed: "left" as const,
       render: (value: string) => <Tag color="geekblue">{value}</Tag>,
     },
-    ...roles.map((role: string) => ({
-      title: String(role),
-      dataIndex: String(role),
-      align: "center" as const,
-      render: (value: boolean) =>
-        value && <CheckCircleTwoTone twoToneColor="#52c41a" />,
-    })),
+    ...roleIds.map((roleId: string) => {
+      const roleName = roleIdNameMap[roleId] || roleId;
+      return {
+        title: roleName,
+        dataIndex: String(roleId),
+        align: "center" as const,
+        render: (value: boolean, record: any) => (
+          <Button
+            style={{ cursor: "pointer" }}
+            onClick={async () =>
+              mutate(
+                {
+                  url: "permissions_toggle",
+                  method: "post",
+                  values: {
+                    role_id: roleId,
+                    resource: record.resource,
+                    action: record.action,
+                  },
+                },
+                {
+                  onSuccess: () =>
+                    invalidate({
+                      resource: "permissions",
+                      invalidates: ["resourceAll"],
+                    }),
+                }
+              )
+            }
+            type="text"
+            shape="circle"
+            icon={
+              value ? (
+                <CheckCircleTwoTone twoToneColor="#52c41a" />
+              ) : (
+                <CloseCircleOutlined />
+              )
+            }
+          />
+        ),
+      };
+    }),
   ];
 
   return (
     <List>
       <Table
+        {...tableProps}
         size="small"
         columns={columns}
         dataSource={data}
         rowKey="key"
-        scroll={{ x: true }}
-        pagination={false}
+        loading={isFetching}
       />
     </List>
   );

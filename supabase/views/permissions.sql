@@ -6,6 +6,7 @@ WITH
 SELECT
     r.resource,
     r.action,
+    rl.id AS role_id,
     rl.name AS role_name
 FROM
     public_v2._project_members pm
