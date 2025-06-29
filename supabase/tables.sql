@@ -73,6 +73,7 @@ CREATE TABLE public_v2._projects (
     created_by UUID NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     updated_at timestamp with time zone NOT NULL DEFAULT NOW(),
+    deleted_at timestamp with time zone,
     CONSTRAINT _projects_pkey PRIMARY KEY (id),
     CONSTRAINT _projects_created_by_fkey FOREIGN KEY (created_by) REFERENCES public_v2._users (id)
 );

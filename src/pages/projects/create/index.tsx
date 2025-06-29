@@ -7,6 +7,11 @@ export const ProjectsCreate = ({ isEdit }: { isEdit?: boolean }) => {
   const navigate = useNavigate(); // Initialize useNavigate
   const { id } = useParsed();
   const { formProps, saveButtonProps, onFinish } = useForm({
+    defaultFormValues: {
+      name: "",
+      description: "",
+      tags: [],
+    },
     resource: "projects",
     id,
     action: isEdit ? "edit" : "create",

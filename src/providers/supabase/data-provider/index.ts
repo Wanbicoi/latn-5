@@ -6,14 +6,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * Map resource names to their corresponding RPC function names.
  * Add more mappings as needed.
  */
-const rpcMap: Record<string, string> = {
-  projects: "projects_create",
-  workflows: "workflows_update",
-  datasets: "datasets_update",
-  // Add more mappings as needed, e.g.:
-  // task: "task_create",
-  // tasks: "task_create",
-};
 
 export const dataProvider = (
   supabaseClient: SupabaseClient<any, string, any>
@@ -89,27 +81,13 @@ export const dataProvider = (
     create: async ({ resource, variables, meta }) => {
       const tableName = meta?.schema ? `${meta.schema}.${resource}` : resource;
 
-      const rpcFn = rpcMap[resource];
-      if (rpcFn) {
-        const { data, error } = await supabaseClient.rpc(rpcFn, variables);
-        if (error) {
-          return handleError(error);
-        }
-        return {
-          data: Array.isArray(data) ? data[0] : data,
-        };
-      }
-
-      const query = supabaseClient.from(tableName).insert(variables);
-      query.select(meta?.select ?? "*");
-      const { data, error } = await query;
-
+      const rpcFn = `${resource}_create`;
+      const { data, error } = await supabaseClient.rpc(rpcFn, variables);
       if (error) {
         return handleError(error);
       }
-
       return {
-        data: (data || [])[0] as any,
+        data: Array.isArray(data) ? data[0] : data,
       };
     },
 
@@ -133,37 +111,16 @@ export const dataProvider = (
     update: async ({ resource, id, variables, meta }) => {
       const tableName = meta?.schema ? `${meta.schema}.${resource}` : resource;
 
-      const rpcFn = rpcMap[resource]?.replace("_create", "_update");
-      if (rpcFn) {
-        const { data, error } = await supabaseClient.rpc(rpcFn, {
-          id,
-          ...variables,
-        });
-        if (error) {
-          return handleError(error);
-        }
-        return {
-          data: Array.isArray(data) ? data[0] : data,
-        };
-      }
-
-      const query = supabaseClient.from(tableName).update(variables);
-
-      if (meta?.idColumnName) {
-        query.eq(meta.idColumnName, id);
-      } else {
-        query.match({ id });
-      }
-
-      query.select(meta?.select ?? "*");
-
-      const { data, error } = await query;
+      const rpcFn = `${resource}_update`;
+      const { data, error } = await supabaseClient.rpc(rpcFn, {
+        id,
+        ...variables,
+      });
       if (error) {
         return handleError(error);
       }
-
       return {
-        data: (data || [])[0] as any,
+        data: Array.isArray(data) ? data[0] : data,
       };
     },
 
@@ -220,32 +177,13 @@ export const dataProvider = (
     deleteOne: async ({ resource, id, meta }) => {
       const tableName = meta?.schema ? `${meta.schema}.${resource}` : resource;
 
-      const rpcFn = rpcMap[resource]?.replace("_create", "_delete");
-      if (rpcFn) {
-        const { data, error } = await supabaseClient.rpc(rpcFn, { id });
-        if (error) {
-          return handleError(error);
-        }
-        return {
-          data: Array.isArray(data) ? data[0] : data,
-        };
-      }
-
-      const query = supabaseClient.from(tableName).delete();
-
-      if (meta?.idColumnName) {
-        query.eq(meta.idColumnName, id);
-      } else {
-        query.match({ id });
-      }
-
-      const { data, error } = await query;
+      const rpcFn = `${resource}_delete`;
+      const { data, error } = await supabaseClient.rpc(rpcFn, { id });
       if (error) {
         return handleError(error);
       }
-
       return {
-        data: (data || [])[0] as any,
+        data: Array.isArray(data) ? data[0] : data,
       };
     },
 

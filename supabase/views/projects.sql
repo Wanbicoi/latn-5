@@ -29,6 +29,8 @@ FROM
     LEFT JOIN public_v2._workflows w ON w.project_id = p.id
     LEFT JOIN public_v2._project_to_tags pt ON pt.project_id = p.id
     LEFT JOIN public_v2._project_tags t ON t.id = pt.tag_id
+WHERE
+    p.deleted_at IS NULL
 GROUP BY
     p.id,
     p.name,
