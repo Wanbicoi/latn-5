@@ -21,7 +21,16 @@ This document outlines the technical standards for the data annotation platform.
 
 3.  **SQL Logic**:
     - All SQL functions and triggers **MUST** be idempotent.
-    - Implement atomic state transitions as SQL functions in `supabase/functions/`.
+    - Implement atomic state transitions as SQL functions in `supabase/functions/`. Here is the template for functions:
+      ```sql
+      DROP FUNCTION IF EXISTS public_v2.<function_name> (...);
+
+      CREATE OR REPLACE FUNCTION public_v2.<function_name> (...) RETURNS ... AS $$
+      BEGIN
+          ...
+      END;
+      $$ LANGUAGE plpgsql VOLATILE;
+      ```
     - All views **MUST** use `WITH (security_invoker = true)` to ensure security context, like so:
       ```sql
       DROP VIEW IF EXISTS public_v2.<view_name>;
