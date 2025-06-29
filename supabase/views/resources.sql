@@ -4,12 +4,12 @@ WITH
 SELECT
     id,
     orthanc_uuid,
-    data ->> 'StudyInstanceUID' AS "StudyInstanceUID",
-    data ->> 'PatientID' AS "PatientID",
-    data ->> 'PatientName' AS "PatientName",
-    data ->> 'PatientSex' AS "PatientSex",
-    data ->> 'AccessionNumber' AS "AccessionNumber",
-    data ->> 'ReferringPhysicianName' AS "ReferringPhysicianName",
+    data -> 'metadata' ->> 'StudyInstanceUID' AS "StudyInstanceUID",
+    data -> 'patientInfo' -> 'MainDicomTags' ->> 'PatientID' AS "PatientID",
+    data -> 'patientInfo' -> 'MainDicomTags' ->> 'PatientName' AS "PatientName",
+    data -> 'patientInfo' -> 'MainDicomTags' ->> 'PatientSex' AS "PatientSex",
+    data -> 'metadata' ->> 'AccessionNumber' AS "AccessionNumber",
+    data -> 'metadata' ->> 'ReferringPhysicianName' AS "ReferringPhysicianName",
     data
 FROM
     public_v2._datasource_integrations;

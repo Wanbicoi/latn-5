@@ -14,11 +14,12 @@ function OnStableStudy(studyId, tags, metadata)
   })
 
   HttpPost(
-    "https://bmeemseeqpnsqgwdpcoj.supabase.co/rest/v1/public_v2._datasource_integrations",
+    "https://bmeemseeqpnsqgwdpcoj.supabase.co/rest/v1/_datasource_integrations",
     body,
     {
       ["Content-Type"] = "application/json",
       ["apikey"] = "",
+      ["Content-Profile"] = "public_v2",
     }
   )
 end
@@ -27,10 +28,11 @@ function OnDeletedStudy(studyId)
   print(">>> OnDeletedStudy triggered: " .. studyId)
 
   HttpDelete(
-    "https://bmeemseeqpnsqgwdpcoj.supabase.co/rest/v1/public_v2._datasource_integrations?uuid=eq." .. studyId,
+    "https://bmeemseeqpnsqgwdpcoj.supabase.co/rest/v1/_datasource_integrations?orthanc_uuid=eq." .. studyId,
     {
       ["Content-Type"] = "application/json",
       ["apikey"] = "",
+      ["Content-Profile"] = "public_v2",
     }
     )
 end
