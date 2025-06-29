@@ -6,7 +6,9 @@ DECLARE
     v_permission_id uuid;
 BEGIN
     -- Find resource_id
-    SELECT id INTO v_resource_id FROM public_v2._resources WHERE public_v2._resources.resource = permissions_toggle.resource;
+    SELECT id INTO v_resource_id FROM public_v2._resources 
+        WHERE public_v2._resources.resource = permissions_toggle.resource 
+            AND public_v2._resources.action = permissions_toggle.action;
     IF v_resource_id IS NULL THEN
         RAISE EXCEPTION 'Resource not found: %', permissions_toggle.resource;
     END IF;
