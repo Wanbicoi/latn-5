@@ -3,7 +3,7 @@ DECLARE
     p_task_id uuid;
 BEGIN
     -- Get the task_id from the task_assignment
-    SELECT task_id INTO p_task_id FROM public_v2.task_assignments WHERE id = p_task_assignment_id;
+    SELECT task_id INTO p_task_id FROM public_v2._task_assignments WHERE id = p_task_assignment_id;
 
     IF p_new_stage_id IS NULL THEN
         UPDATE public_v2._tasks
@@ -14,17 +14,17 @@ BEGIN
         WHERE id = p_task_assignment_id;
     ELSE
         -- change status of current task_assignment to 'COMPLETED'
-        UPDATE public_v2.task_assignments
+        UPDATE public_v2._task_assignments
         SET status = 'COMPLETED'
         WHERE id = p_task_assignment_id; 
 
-        INSERT INTO public_v2.task_assignments (task_id, stage_id, assigned_to, status)
+        INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to, status)
         SELECT
             p_task_id,
             p_new_stage_id,
-            assignee_id,
+            assignees.user_id,
             'PENDING' -- All new assignments start as PENDING
-        FROM unnest(public_v2.get_workflow_stage_assignees(p_new_stage_id)) AS assignee_id;
+        FROM public_v2.get_workflow_stage_assignees(p_new_stage_id) assignees;
     END IF;
 END;
 $$ LANGUAGE plpgsql;

@@ -24,12 +24,18 @@ import Title from "./components/title";
 import { ProjectsCreate, ProjectsList, ProjectsShow } from "./pages/projects";
 import { MembersList } from "./pages/members";
 import { TagsList } from "./pages/tags";
+import PermissionsList from "./pages/permissions/list";
 import { supabaseClient } from "./utils";
 import { accessControlProvider } from "./providers/access-control";
 import { ohifTheme } from "./ohif-theme";
 import Homepage from "./pages/home";
 import { OhifViewerProvider } from "./contexts/ohif-viewer";
-import { ProjectOutlined, TagsOutlined, TeamOutlined } from "@ant-design/icons";
+import {
+  LockOutlined,
+  ProjectOutlined,
+  TagsOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
 import { dataProvider } from "./providers/supabase";
 
 function App() {
@@ -74,6 +80,14 @@ function App() {
                     },
                     list: "/members",
                   },
+                  {
+                    name: "permissions",
+                    meta: {
+                      label: "Permissions",
+                      icon: <LockOutlined />,
+                    },
+                    list: "/permissions",
+                  },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -116,6 +130,7 @@ function App() {
                     </Route>
                     <Route path="/tags" element={<TagsList />} />
                     <Route path="/members" element={<MembersList />} />
+                    <Route path="/permissions" element={<PermissionsList />} />
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
                   <Route
