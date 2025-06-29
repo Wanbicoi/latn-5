@@ -114,13 +114,25 @@ export function ProjectsShow() {
       <ChooseDataForAnnotate
         formProps={dataFormProps}
         dataModalProps={dataModalProps}
+        project={project}
       />
     </Show>
   );
 }
 
-function ChooseDataForAnnotate({ formProps, dataModalProps }: any) {
+function ChooseDataForAnnotate({ formProps, dataModalProps, project }: any) {
   const { data: orthancResourceData } = useList({ resource: "resources" });
+
+  // Custom onFinish to transform values before submit
+  const handleOnFinish = (values: {
+    resources: string[];
+    project_id: string;
+  }) => {
+    formProps.onFinish?.({
+      p_project_id: project?.id,
+      p_resource_ids: values.resources,
+    });
+  };
 
   return (
     <Modal
@@ -131,7 +143,7 @@ function ChooseDataForAnnotate({ formProps, dataModalProps }: any) {
       cancelText="Cancel"
       destroyOnHidden
     >
-      <Form {...formProps} layout="vertical">
+      <Form {...formProps} layout="vertical" onFinish={handleOnFinish}>
         <Form.Item
           name="resources"
           rules={[
