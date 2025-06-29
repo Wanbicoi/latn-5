@@ -31,7 +31,8 @@ export function ProjectsShow() {
     formProps: dataFormProps,
     show: showDatasetsModal,
   } = useModalForm({
-    action: "create",
+    action: "edit",
+    id: project?.id,
     resource: "datasets",
   });
 
@@ -123,17 +124,6 @@ export function ProjectsShow() {
 function ChooseDataForAnnotate({ formProps, dataModalProps, project }: any) {
   const { data: orthancResourceData } = useList({ resource: "resources" });
 
-  // Custom onFinish to transform values before submit
-  const handleOnFinish = (values: {
-    resources: string[];
-    project_id: string;
-  }) => {
-    formProps.onFinish?.({
-      p_project_id: project?.id,
-      p_resource_ids: values.resources,
-    });
-  };
-
   return (
     <Modal
       {...dataModalProps}
@@ -143,7 +133,7 @@ function ChooseDataForAnnotate({ formProps, dataModalProps, project }: any) {
       cancelText="Cancel"
       destroyOnHidden
     >
-      <Form {...formProps} layout="vertical" onFinish={handleOnFinish}>
+      <Form {...formProps} layout="vertical">
         <Form.Item
           name="resources"
           rules={[

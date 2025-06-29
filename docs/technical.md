@@ -14,10 +14,9 @@ This document outlines the technical standards for the data annotation platform.
 
 2.  **Schema Management**:
     - Define the initial schema in `supabase/tables.sql` and `supabase/policies.sql`.
-    - To apply any changes from a `.sql` file within the `supabase` directory (including `tables`, `policies`, `functions`, or `views`), run the following command from the `frontend` directory:
+    - REMEMBER to apply new changes from `functions`, or `views` folder within the `supabase` directory by runing the following command:
       ```bash
-      # From the /frontend directory
-      yarn run psql ../supabase/<file_path>
+      yarn run psql ./supabase/<file_path>
       ```
 
 3.  **SQL Logic**:
