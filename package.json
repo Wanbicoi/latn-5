@@ -44,7 +44,8 @@
     "build": "tsc && refine build",
     "start": "refine start",
     "refine": "refine",
-    "psql": "psql -h db.bmeemseeqpnsqgwdpcoj.supabase.co -U postgres -d postgres -v ON_ERROR_STOP=1 -v schema=public_v2 --set=search_path=public_v2 -f"
+    "psql": "psql -h db.bmeemseeqpnsqgwdpcoj.supabase.co -U postgres -d postgres -v ON_ERROR_STOP=1 -v schema=public_v2 --set=search_path=public_v2 -f",
+    "psql-general": "psql -h db.bmeemseeqpnsqgwdpcoj.supabase.co -U postgres -d postgres -v ON_ERROR_STOP=1 -v schema=public_v2 --set=search_path=public_v2 -f supabase/general.sql"
   },
   "browserslist": {
     "production": [
