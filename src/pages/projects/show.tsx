@@ -32,7 +32,6 @@ export function ProjectsShow() {
     show: showDatasetsModal,
   } = useModalForm({
     action: "edit",
-    id: project?.id,
     resource: "datasets",
   });
 
@@ -98,7 +97,10 @@ export function ProjectsShow() {
       <Button type="primary" onClick={handleSave} loading={isLoading}>
         Save Workflow
       </Button>
-      <Button style={{ marginLeft: 8 }} onClick={() => showDatasetsModal()}>
+      <Button
+        style={{ marginLeft: 8 }}
+        onClick={() => showDatasetsModal(project?.id)}
+      >
         Choose Data for Annotate
       </Button>
       <WorkflowGraph
