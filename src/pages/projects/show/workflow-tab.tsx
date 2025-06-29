@@ -59,12 +59,12 @@ export function WorkflowTab() {
   });
 
   // Restrict workflow creation/saving to once per project
-  const hasWorkflow = false; // TODO: !!workflow?.id;
+  const hasWorkflow = false; //!!workflow?.id;
 
   // Editable workflow state
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { mutate, isLoading } = useCustomMutation({});
+  const { mutate } = useCustomMutation({});
 
   // Save handler
   const handleSave = async () => {
