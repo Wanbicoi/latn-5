@@ -3,7 +3,8 @@ CREATE TYPE public.assignment_status AS ENUM(
     'IN_PROGRESS',
     'SUBMITTED',
     'APPROVED',
-    'REJECTED'
+    'REJECTED',
+    'COMPLETED'
 );
 
 CREATE TYPE public.notification_type AS ENUM(
