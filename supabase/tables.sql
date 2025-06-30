@@ -159,3 +159,9 @@ CREATE TABLE public_v2._workflows (
     CONSTRAINT _workflows_begin_stage_id_fkey FOREIGN KEY (begin_stage_id) REFERENCES public_v2._workflow_stages (id),
     CONSTRAINT _workflows_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id)
 );
+
+CREATE TABLE public_v2._workflow_stage_functions (
+    type public_v2.stage_type NOT NULL,
+    get_assignees TEXT NOT NULL,
+    CONSTRAINT _workflow_stage_functions_pkey PRIMARY KEY (type)
+);

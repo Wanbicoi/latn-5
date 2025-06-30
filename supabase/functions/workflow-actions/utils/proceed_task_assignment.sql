@@ -18,13 +18,24 @@ BEGIN
         SET status = 'COMPLETED'
         WHERE id = p_task_assignment_id; 
 
-        INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to, status)
-        SELECT
-            p_task_id,
-            p_new_stage_id,
-            assignees.user_id,
-            'PENDING' -- All new assignments start as PENDING
-        FROM public_v2.get_workflow_stage_assignees(p_new_stage_id) assignees;
+        -- Get next assignee
+        DECLARE
+            v_next_assignee UUID;
+        BEGIN
+            v_next_assignee := public_v2.get_workflow_stage_next_assignee(p_new_stage_id);
+
+            IF v_next_assignee IS NULL THEN
+                -- No assignee found, do not insert assignment
+                RETURN;
+            END IF;
+
+            INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
+            VALUES (
+                p_task_id,
+                p_new_stage_id,
+                v_next_assignee
+            );
+        END;
     END IF;
 END;
 $$ LANGUAGE plpgsql;

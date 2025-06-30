@@ -9,11 +9,12 @@ import {
   Flex,
   Popconfirm,
 } from "antd";
+import { Select } from "antd";
 import { useCustomMutation, useList } from "@refinedev/core";
 import { useModalForm } from "@refinedev/antd";
 import { type Node, type Edge, useEdgesState, useNodesState } from "reactflow";
-import { useEffect } from "react";
-import { EyeOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import FormItemTable from "@/components/form-item/table";
 import WorkflowGraph from "@/components/workflow-graph";
 
@@ -45,8 +46,18 @@ export function WorkflowTab() {
     resource: "datasets",
   });
 
+  const {
+    modalProps: memberModalProps,
+    formProps: memberFormProps,
+    show: showMemberModal,
+  } = useModalForm({
+    action: "edit",
+    resource: "project_members",
+  });
+
   // Restrict workflow creation/saving to once per project
-  const hasWorkflow = !!workflow?.id;
+  const hasWorkflow = false;
+  // const hasWorkflow = !!workflow?.id;
 
   // Editable workflow state
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -55,12 +66,11 @@ export function WorkflowTab() {
 
   // Save handler
   const handleSave = async () => {
-    if (!workflow?.id) return;
     mutate({
-      url: "workflows_update",
+      url: "workflows_create",
       method: "post",
       values: {
-        p_workflow_id: workflow.id,
+        project_id: project_id,
         nodes,
         edges,
       },
@@ -85,12 +95,14 @@ export function WorkflowTab() {
     <Space direction="vertical" style={{ width: "100%" }}>
       {!hasWorkflow && (
         <Flex justify="space-between">
-          <Button
-            style={{ marginLeft: 8 }}
-            onClick={() => showDatasetsModal(project_id)}
-          >
-            Choose Data for Annotate
-          </Button>
+          <Space>
+            <Button onClick={() => showMemberModal(project_id)}>
+              Choose Project Members
+            </Button>
+            <Button onClick={() => showDatasetsModal(project_id)}>
+              Choose Data for Annotate
+            </Button>
+          </Space>
           <Popconfirm
             placement="left"
             title="Are you sure you want to delete this workflow?"
@@ -115,6 +127,10 @@ export function WorkflowTab() {
       <ChooseDataForAnnotate
         formProps={dataFormProps}
         dataModalProps={dataModalProps}
+      />
+      <ChooseProjectMember
+        formProps={memberFormProps}
+        memberModalProps={memberModalProps}
       />
     </Space>
   );
@@ -173,6 +189,89 @@ function ChooseDataForAnnotate({ formProps, dataModalProps }: any) {
             />
           </FormItemTable>
         </Form.Item>
+      </Form>
+    </Modal>
+  );
+}
+function ChooseProjectMember({ formProps, memberModalProps }: any) {
+  const { data: membersData } = useList({ resource: "members" });
+  const { data: rolesData } = useList({ resource: "roles" });
+
+  return (
+    <Modal
+      {...memberModalProps}
+      width={500}
+      title="Select project members and roles"
+      okText="Done"
+      cancelText="Cancel"
+      destroyOnHidden
+    >
+      <Form {...formProps} layout="vertical">
+        <Form.List name="members">
+          {(fields, { add, remove }) => (
+            <Space direction="vertical" style={{ width: "100%" }}>
+              {fields.map(({ key, name, ...restField }) => (
+                <Space key={key}>
+                  <Form.Item
+                    noStyle
+                    {...restField}
+                    name={[name, "id"]}
+                    rules={[{ required: true, message: "Select member" }]}
+                  >
+                    <Select
+                      placeholder="Member"
+                      style={{ width: 180 }}
+                      options={
+                        membersData?.data
+                          ?.filter((m: any) => {
+                            // Exclude already selected except for this row
+                            const selectedIds =
+                              formProps.form
+                                ?.getFieldValue("members")
+                                ?.map((mem: any, idx: number) =>
+                                  idx === name ? null : mem?.id
+                                ) || [];
+                            return !selectedIds.includes(m.id);
+                          })
+                          .map((m: any) => ({
+                            label: m.full_name,
+                            value: m.id,
+                          })) || []
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    noStyle
+                    {...restField}
+                    name={[name, "role_id"]}
+                    rules={[{ required: true, message: "Select role" }]}
+                  >
+                    <Select
+                      placeholder="Role"
+                      style={{ width: 140 }}
+                      options={
+                        rolesData?.data?.map((r: any) => ({
+                          label: r.name,
+                          value: r.id,
+                        })) || []
+                      }
+                    />
+                  </Form.Item>
+                  <Button
+                    size="small"
+                    danger
+                    shape="circle"
+                    onClick={() => remove(name)}
+                    icon={<DeleteOutlined />}
+                  />
+                </Space>
+              ))}
+              <Button type="dashed" onClick={() => add()} block>
+                Add Member
+              </Button>
+            </Space>
+          )}
+        </Form.List>
       </Form>
     </Modal>
   );

@@ -1,14 +1,12 @@
--- workflows_update.sql
--- Atomic function to update workflow nodes and edges for a given workflow_id
-CREATE OR REPLACE FUNCTION public_v2.workflows_update (p_workflow_id UUID, nodes JSONB, edges JSONB) RETURNS VOID LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION public_v2.workflows_create (project_id UUID, nodes JSONB, edges JSONB) RETURNS VOID LANGUAGE plpgsql AS $$
 DECLARE
     node_obj RECORD;
     stage_id_var UUID;
+    p_workflow_id UUID;
 BEGIN
-    -- Update graph_data column with nodes and edges
-    UPDATE public_v2._workflows
-    SET graph_data = jsonb_build_object('nodes', nodes, 'edges', edges)
-    WHERE id = p_workflow_id;
+    INSERT INTO public_v2._workflows (project_id, graph_data)
+    VALUES (workflows_create.project_id, jsonb_build_object('nodes', nodes, 'edges', edges))
+    RETURNING id INTO p_workflow_id;
 
     -- Remove existing workflow stages for this workflow
     DELETE FROM public_v2._workflow_stages WHERE workflow_id = p_workflow_id;
@@ -28,7 +26,7 @@ BEGIN
             VALUES (
                 p_workflow_id,
                 node_obj.node->'data'->>'label',
-                (node_obj.node->>'type')::text::public.stage_type
+                (node_obj.node->>'type')::text::public_v2.stage_type
             )
             RETURNING id INTO stage_id_var;
 
@@ -97,19 +95,22 @@ BEGIN
             WHERE id = p_workflow_id;
         END IF;
 
-        -- Create task assignments for each assignee of the v_begin_stage_id
-        INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to, status)
-        SELECT *
-        FROM (
-            SELECT
-                t.id,
+        DECLARE
+            v_next_assignee UUID;
+        BEGIN
+            v_next_assignee := public_v2.get_workflow_stage_next_assignee(v_begin_stage_id);
+
+            IF v_next_assignee IS NULL THEN
+                RETURN;
+            END IF;
+
+            INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
+            VALUES (
+                p_task_id,
                 v_begin_stage_id,
-                assignee.user_id,
-                'PENDING'::public.assignment_status
-            FROM public_v2._tasks t
-            JOIN public_v2.get_workflow_stage_assignees(v_begin_stage_id) assignee
-                ON t.project_id = (SELECT project_id FROM public_v2._workflows WHERE id = p_workflow_id)
-        ) AS sub;
+                v_next_assignee
+            );
+        END;
     END;
 END;
 $$;
