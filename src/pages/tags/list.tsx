@@ -1,7 +1,6 @@
 import { List, useTable, useModalForm, DateField } from "@refinedev/antd";
 import { Table, Modal, Form, Input, Space, Tag, Select } from "antd";
 import { EditButton, DeleteButton } from "@refinedev/antd";
-import { useNotification } from "@refinedev/core";
 import { getColorOptions } from "../../utils/colors";
 
 const colorOptions = getColorOptions();
