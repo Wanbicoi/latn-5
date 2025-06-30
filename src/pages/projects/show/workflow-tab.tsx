@@ -17,12 +17,6 @@ import { EyeOutlined } from "@ant-design/icons";
 import FormItemTable from "@/components/form-item/table";
 import WorkflowGraph from "@/components/workflow-graph";
 
-type Project = {
-  id: string;
-  name: string;
-  workflow_id?: string;
-};
-
 type Workflow = {
   id: string;
   name: string;
@@ -52,7 +46,7 @@ export function WorkflowTab() {
   });
 
   // Restrict workflow creation/saving to once per project
-  const hasWorkflow = false; //!!workflow?.id;
+  const hasWorkflow = !!workflow?.id;
 
   // Editable workflow state
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
