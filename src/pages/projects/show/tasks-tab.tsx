@@ -1,7 +1,7 @@
 import { ArrowRightOutlined, EyeOutlined } from "@ant-design/icons";
 import { DateField, useTable } from "@refinedev/antd";
-import { useCustomMutation } from "@refinedev/core";
-import { Button, Popconfirm, Space, Table, Tooltip } from "antd";
+import { useCustomMutation, useInvalidate } from "@refinedev/core";
+import { Button, Popconfirm, Space, Table, Tooltip, Descriptions } from "antd";
 
 export function TasksTab() {
   const { tableProps } = useTable({
@@ -9,6 +9,7 @@ export function TasksTab() {
     syncWithLocation: false,
   });
   const { mutate } = useCustomMutation();
+  const invalidate = useInvalidate();
 
   return (
     <Table
@@ -26,32 +27,23 @@ export function TasksTab() {
           dataIndex: "file",
           key: "file",
           sorter: true,
+          width: 500,
           render: (file: any) =>
             file ? (
-              <div>
-                <div>
-                  <b>Patient ID:</b> {file.PatientID || "-"}
-                </div>
-                <div>
-                  <b>Patient Name:</b> {file.PatientName || "-"}
-                </div>
-                <div>
-                  <b>Patient Sex:</b> {file.PatientSex || "-"}
-                </div>
-                <div>
-                  <b>Study Instance UID:</b> {file.StudyInstanceUID || "-"}
-                </div>
-                <div>
-                  <b>Accession Number:</b> {file.AccessionNumber || "-"}
-                </div>
-                <div>
-                  <b>Referring Physician:</b>{" "}
+              <Descriptions size="small" column={2}>
+                <Descriptions.Item label="Patient ID">
+                  {file.PatientID || "-"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Name">
+                  {file.PatientName || "-"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Sex">
+                  {file.PatientSex || "-"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Physician">
                   {file.ReferringPhysicianName || "-"}
-                </div>
-                <div>
-                  <b>Orthanc UUID:</b> {file.orthanc_uuid || "-"}
-                </div>
-              </div>
+                </Descriptions.Item>
+              </Descriptions>
             ) : (
               "-"
             ),
@@ -78,35 +70,43 @@ export function TasksTab() {
         {
           dataIndex: "actions",
           key: "actions",
-          render: (record: any) => (
+          render: (_, record: any) => (
             <Space>
               <Tooltip title="View only">
                 <Button
                   type="primary"
                   size="small"
                   icon={<EyeOutlined />}
-                  onClick={() =>
-                    location.assign(
-                      `${
-                        import.meta.env.VITE_OHIFVIEWER_ROUTE
-                      }?StudyInstanceUIDs=${
-                        record.file.StudyInstanceUID
-                      }&taskId=${record.id}`
-                    )
-                  }
+                  onClick={() => openViewerForTask(record)}
                 />
               </Tooltip>
               <Popconfirm
                 title="Mark this task as in progress?"
                 onConfirm={() =>
-                  mutate({
-                    url: "tasks_start",
-                    method: "post",
-                    values: { task_assignment_id: record.id },
-                  })
+                  mutate(
+                    {
+                      url: "tasks_start",
+                      method: "post",
+                      values: { task_assignment_id: record.id },
+                    },
+                    {
+                      onSuccess: () => {
+                        invalidate({
+                          resource: "tasks",
+                          invalidates: ["list"],
+                        });
+                        openViewerForTask(record);
+                      },
+                    }
+                  )
                 }
               >
-                <Button type="primary" icon={<ArrowRightOutlined />}>
+                <Button
+                  type="primary"
+                  iconPosition="end"
+                  icon={<ArrowRightOutlined />}
+                  size="small"
+                >
                   Start
                 </Button>
               </Popconfirm>
@@ -115,5 +115,14 @@ export function TasksTab() {
         },
       ]}
     />
+  );
+}
+
+function openViewerForTask(record: any) {
+  window.open(
+    `${import.meta.env.VITE_OHIFVIEWER_ROUTE}?StudyInstanceUIDs=${
+      record.file.StudyInstanceUID
+    }&taskId=${record.id}`,
+    "_blank"
   );
 }

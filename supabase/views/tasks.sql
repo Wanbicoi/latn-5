@@ -30,4 +30,6 @@ FROM
     JOIN public_v2._tasks t ON ta.task_id = t.id
     JOIN public_v2._workflow_stages ws ON ta.stage_id = ws.id
     JOIN public_v2._users u ON ta.assigned_to = u.id
-    JOIN public_v2._datasource_integrations di ON t.data_item_id = di.id;
+    JOIN public_v2._datasource_integrations di ON t.data_item_id = di.id
+WHERE
+    u.is_system = false;
