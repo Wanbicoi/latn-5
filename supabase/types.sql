@@ -1,5 +1,7 @@
 CREATE TYPE public_v2.assignment_status AS ENUM('PENDING', 'IN_PROGRESS', 'COMPLETED');
 
+CREATE TYPE public_v2.task_status AS ENUM('PENDING', 'ARCHIVED', 'COMPLETED');
+
 CREATE TYPE public_v2.notification_type AS ENUM(
     'ASSIGNMENT_CREATED',
     'STATUS_CHANGED',

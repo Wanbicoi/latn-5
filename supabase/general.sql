@@ -1,1 +1,2 @@
-create policy "allow_all_public" on "public_v2"."_annotation_comments" as PERMISSIVE for ALL to authenticated using (true);
+select
+    public_v2.workflow_annotate_approve ('4582eda2-4b26-4392-b1a7-30e20b790c82');

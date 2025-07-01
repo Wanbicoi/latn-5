@@ -11,20 +11,22 @@ BEGIN
         WHERE id = p_task_assignment_id;
     ELSE
         -- change status of current task_assignment to 'COMPLETED'
+        IF EXISTS (
+            SELECT 1 FROM public_v2._task_assignments
+            WHERE id = p_task_assignment_id AND status = 'COMPLETED'
+        ) THEN
+            RETURN;
+        END IF;
+        
         UPDATE public_v2._task_assignments
         SET status = 'COMPLETED'
-        WHERE id = p_task_assignment_id; 
+        WHERE id = p_task_assignment_id;
 
         -- Get next assignee
         DECLARE
             v_next_assignee UUID;
         BEGIN
             v_next_assignee := public_v2.get_workflow_stage_next_assignee(p_new_stage_id);
-
-            IF v_next_assignee IS NULL THEN
-                -- No assignee found, do not insert assignment
-                RETURN;
-            END IF;
 
             INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
             VALUES (
