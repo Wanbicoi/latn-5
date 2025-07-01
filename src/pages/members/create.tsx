@@ -8,7 +8,6 @@ interface CreateMemberForm {
   email: string;
   password: string;
   fullName: string;
-  role: string;
 }
 
 interface CreateMemberFormProps {
@@ -33,7 +32,6 @@ export function CreateMemberForm({
           options: {
             data: {
               full_name: values.fullName,
-              role: values.role, // Pass role to raw_user_meta_data for the trigger
             },
           },
         });
@@ -91,15 +89,6 @@ export function CreateMemberForm({
       >
         <Input />
       </Form.Item>
-
-      <Form.Item label="Role" name="role" initialValue="labeler">
-        <Select>
-          <Select.Option value="admin">Admin</Select.Option>
-          <Select.Option value="reviewer">Reviewer</Select.Option>
-          <Select.Option value="labeler">Labeler</Select.Option>
-        </Select>
-      </Form.Item>
-
       <Form.Item>
         <Flex justify="end" gap={8}>
           <Button type="primary" htmlType="submit" loading={formLoading}>
