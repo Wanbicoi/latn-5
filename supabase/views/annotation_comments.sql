@@ -14,4 +14,6 @@ SELECT
     ac.created_at
 FROM
     public_v2._annotation_comments ac
+    JOIN public_v2._task_assignments ta ON ac.task_assignment_id = ta.id
+    JOIN public_v2._tasks o ON ta.task_id = o.id
     LEFT JOIN public_v2._users u ON ac.author_id = u.id;
