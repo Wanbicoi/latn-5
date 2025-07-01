@@ -8,6 +8,7 @@ import {
   Space,
   Flex,
   Popconfirm,
+  Spin,
 } from "antd";
 import { Select } from "antd";
 import { useCustomMutation, useList } from "@refinedev/core";
@@ -31,7 +32,7 @@ type Workflow = {
 export function WorkflowTab() {
   const { id: project_id } = useParsed();
 
-  const { data: workflowData } = useOne<Workflow>({
+  const { data: workflowData, isLoading } = useOne<Workflow>({
     resource: "workflows",
     id: project_id,
   });
@@ -92,47 +93,49 @@ export function WorkflowTab() {
   }, [workflow?.graph_data, setNodes, setEdges]);
 
   return (
-    <Space direction="vertical" style={{ width: "100%" }}>
-      {!hasWorkflow && (
-        <Flex justify="space-between">
-          <Space>
-            <Button onClick={() => showMemberModal(project_id)}>
-              Choose Project Members
-            </Button>
-            <Button onClick={() => showDatasetsModal(project_id)}>
-              Choose Data for Annotate
-            </Button>
-          </Space>
-          <Popconfirm
-            placement="left"
-            title="Are you sure you want to delete this workflow?"
-            onConfirm={handleSave}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button type="primary">Create Workflow</Button>
-          </Popconfirm>
-        </Flex>
-      )}
-      <WorkflowGraph
-        editable={!hasWorkflow}
-        nodes={nodes}
-        edges={edges}
-        setNodes={setNodes}
-        setEdges={setEdges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        workflowId={workflow?.id}
-      />
-      <ChooseDataForAnnotate
-        formProps={dataFormProps}
-        dataModalProps={dataModalProps}
-      />
-      <ChooseProjectMember
-        formProps={memberFormProps}
-        memberModalProps={memberModalProps}
-      />
-    </Space>
+    <Spin spinning={isLoading}>
+      <Space direction="vertical" style={{ width: "100%" }}>
+        {!hasWorkflow && (
+          <Flex justify="space-between">
+            <Space>
+              <Button onClick={() => showMemberModal(project_id)}>
+                Choose Project Members
+              </Button>
+              <Button onClick={() => showDatasetsModal(project_id)}>
+                Choose Data for Annotate
+              </Button>
+            </Space>
+            <Popconfirm
+              placement="left"
+              title="Are you sure you want to delete this workflow?"
+              onConfirm={handleSave}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="primary">Create Workflow</Button>
+            </Popconfirm>
+          </Flex>
+        )}
+        <WorkflowGraph
+          editable={!hasWorkflow}
+          nodes={nodes}
+          edges={edges}
+          setNodes={setNodes}
+          setEdges={setEdges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          workflowId={workflow?.id}
+        />
+        <ChooseDataForAnnotate
+          formProps={dataFormProps}
+          dataModalProps={dataModalProps}
+        />
+        <ChooseProjectMember
+          formProps={memberFormProps}
+          memberModalProps={memberModalProps}
+        />
+      </Space>
+    </Spin>
   );
 }
 
