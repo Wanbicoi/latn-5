@@ -160,3 +160,15 @@ CREATE TABLE public_v2._workflows (
     CONSTRAINT _workflows_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id),
     CONSTRAINT _workflows_begin_stage_id_fkey FOREIGN KEY (begin_stage_id) REFERENCES public_v2._workflow_stages (id)
 );
+
+CREATE TABLE public_v2._annotation_comments (
+    id UUID NOT NULL DEFAULT GEN_RANDOM_UUID(),
+    task_assignment_id UUID NOT NULL,
+    author_id UUID NOT NULL,
+    comment TEXT NOT NULL,
+    data JSONB NOT NULL DEFAULT '{}'::JSONB,
+    created_at timestamp with time zone NOT NULL DEFAULT NOW(),
+    CONSTRAINT _annotation_comments_pkey PRIMARY KEY (id),
+    CONSTRAINT _annotation_comments_task_assignment_id_fkey FOREIGN KEY (task_assignment_id) REFERENCES public_v2._task_assignments (id),
+    CONSTRAINT _annotation_comments_author_id_fkey FOREIGN KEY (author_id) REFERENCES public_v2._users (id)
+);

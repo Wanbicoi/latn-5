@@ -30,3 +30,5 @@ create policy "allow_all_public" on "public_v2"."_datasource_integrations" as PE
 create policy "allow_all_public" on "public_v2"."_resources" as PERMISSIVE for ALL to authenticated using (true);
 
 create policy "allow_all_public" on "public_v2"."_role_resources" as PERMISSIVE for ALL to authenticated using (true);
+
+create policy "allow_all_public" on "public_v2"."_annotation_comments" as PERMISSIVE for ALL to authenticated using (true);
