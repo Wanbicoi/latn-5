@@ -8,6 +8,7 @@ CREATE TYPE public_v2.notification_type AS ENUM(
 );
 
 CREATE TYPE public_v2.stage_type AS ENUM(
+    'START',
     'ANNOTATE',
     'REVIEW',
     'CONSENSUS',

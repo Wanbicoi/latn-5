@@ -1,1 +1,2 @@
-drop function public_v2.get_workflow_stage_assignees
+select
+    public_v2.workflow_start ();

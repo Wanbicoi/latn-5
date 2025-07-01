@@ -7,10 +7,7 @@ BEGIN
 
     IF p_new_stage_id IS NULL THEN
         UPDATE public_v2._tasks
-        SET
-            current_stage_id = NULL,
-            is_complete = true,
-            completed_at = NOW()
+        SET completed_at = NOW()
         WHERE id = p_task_assignment_id;
     ELSE
         -- change status of current task_assignment to 'COMPLETED'

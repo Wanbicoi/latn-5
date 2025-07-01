@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION public_v2.workflows_create (project_id UUID, nodes JS
 DECLARE
     node_obj RECORD;
     stage_id_var UUID;
+    start_stage_id UUID;
     p_workflow_id UUID;
 BEGIN
     INSERT INTO public_v2._workflows (project_id, graph_data)
@@ -21,7 +22,7 @@ BEGIN
     FOR node_obj IN SELECT * FROM jsonb_array_elements(nodes) AS node(node)
     LOOP
         -- Only insert if type is a valid stage_type
-        IF node_obj.node->>'type' IN ('ANNOTATE', 'REVIEW', 'CONSENSUS', 'MITL', 'ROUTER', 'SUCCESS', 'ARCHIVED') THEN
+        IF (node_obj.node->>'type')::public_v2.stage_type IS NOT NULL THEN
             INSERT INTO public_v2._workflow_stages (workflow_id, "name", "type")
             VALUES (
                 p_workflow_id,
@@ -29,6 +30,10 @@ BEGIN
                 (node_obj.node->>'type')::text::public_v2.stage_type
             )
             RETURNING id INTO stage_id_var;
+
+            IF node_obj.node->>'type' = 'START' THEN
+                start_stage_id := stage_id_var;
+            END IF;
 
             -- Insert mapping only if stage was inserted
             INSERT INTO tmp_stage_ids(node_id, stage_id)
@@ -65,52 +70,10 @@ BEGIN
     ) sub
     WHERE ws.id = sub.stage_id;
 
-    -- Set begin_stage_id in _workflows to the stage_id of the target of the START node's outgoing edge
-    DECLARE
-        start_node_id TEXT;
-        v_begin_stage_id UUID;
-    BEGIN
-        -- Find the START node's id
-        SELECT node->>'id' INTO start_node_id
-        FROM jsonb_array_elements(nodes) AS node
-        WHERE node->>'type' = 'START'
-        LIMIT 1;
-
-        -- Find the target node id of the START node's outgoing edge
-        IF start_node_id IS NOT NULL THEN
-            SELECT e->>'target'
-            INTO STRICT start_node_id
-            FROM jsonb_array_elements(edges) AS e
-            WHERE e->>'source' = start_node_id
-            LIMIT 1;
-
-            -- Find the stage_id for the target node
-            SELECT stage_id INTO v_begin_stage_id
-            FROM tmp_stage_ids
-            WHERE node_id = start_node_id;
-
-            -- Update the begin_stage_id in _workflows
-            UPDATE public_v2._workflows
-            SET begin_stage_id = v_begin_stage_id
-            WHERE id = p_workflow_id;
-        END IF;
-
-        DECLARE
-            v_next_assignee UUID;
-        BEGIN
-            v_next_assignee := public_v2.get_workflow_stage_next_assignee(v_begin_stage_id);
-
-            IF v_next_assignee IS NULL THEN
-                RETURN;
-            END IF;
-
-            INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
-            VALUES (
-                p_task_id,
-                v_begin_stage_id,
-                v_next_assignee
-            );
-        END;
-    END;
+    -- Insert placeholder assignments for each new task
+    INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
+    SELECT t.id, start_stage_id, '7780000c-1a0c-4c92-9c85-3f8a9668ab00' -- is_system user
+    FROM public_v2._tasks t
+    WHERE t.project_id = workflows_create.project_id;
 END;
 $$;
