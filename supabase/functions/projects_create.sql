@@ -9,10 +9,6 @@ BEGIN
   VALUES (name, description, auth.uid())
   RETURNING id INTO new_project_id;
 
-  -- Insert an associated empty workflow
-  INSERT INTO public_v2._workflows (name, description, created_by, project_id)
-  VALUES ('Default Workflow', NULL, auth.uid(), new_project_id);
-
   -- Associate tags with the new project
   IF array_length(tags, 1) > 0 THEN
     FOREACH tag_id IN ARRAY tags

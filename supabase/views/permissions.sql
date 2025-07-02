@@ -9,7 +9,7 @@ SELECT
     rl.id AS role_id,
     rl.name AS role_name
 FROM
-    public_v2.roles rl
+    public_v2._roles rl
     JOIN public_v2._role_resources rr ON rr.role_id = rl.id
     JOIN public_v2._resources r ON rr.resource_id = r.id
 ORDER BY
