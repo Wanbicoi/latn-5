@@ -6,6 +6,8 @@ import { ResultsTab } from "./results-tab";
 import { OverviewTab } from "./overview-tab";
 import { SettingsTab } from "./settings-tab";
 import { useNavigate, useParams } from "react-router";
+import { Button } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 const TAB_KEYS = ["workflow", "tasks", "results", "overview", "settings"];
 
@@ -34,6 +36,14 @@ export function ProjectsShow() {
   return (
     <Card>
       <Tabs
+        tabBarExtraContent={
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate("/projects")}
+          >
+            Back to Projects
+          </Button>
+        }
         activeKey={activeKey}
         onChange={handleTabChange}
         items={[
