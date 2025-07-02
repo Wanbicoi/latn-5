@@ -2,11 +2,12 @@ import { useEffect, useMemo } from "react";
 import { Card, Tabs } from "antd";
 import { WorkflowTab } from "./workflow-tab";
 import { TasksTab } from "./tasks-tab";
+import { ResultsTab } from "./results-tab";
 import { OverviewTab } from "./overview-tab";
 import { SettingsTab } from "./settings-tab";
 import { useNavigate, useParams } from "react-router";
 
-const TAB_KEYS = ["workflow", "tasks", "overview", "settings"];
+const TAB_KEYS = ["workflow", "tasks", "results", "overview", "settings"];
 
 export function ProjectsShow() {
   const navigate = useNavigate();
@@ -45,6 +46,11 @@ export function ProjectsShow() {
             key: "tasks",
             label: "Tasks",
             children: <TasksTab />,
+          },
+          {
+            key: "results",
+            label: "Results",
+            children: <ResultsTab />,
           },
           {
             key: "overview",

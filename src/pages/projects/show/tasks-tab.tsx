@@ -1,11 +1,22 @@
 import { ArrowRightOutlined, EyeOutlined } from "@ant-design/icons";
 import { DateField, useTable } from "@refinedev/antd";
-import { useCustomMutation, useInvalidate } from "@refinedev/core";
+import { useCustomMutation, useInvalidate, useParsed } from "@refinedev/core";
 import { Button, Popconfirm, Space, Table, Tooltip, Descriptions } from "antd";
 
 export function TasksTab() {
+  const { id: project_id } = useParsed();
+
   const { tableProps } = useTable({
     resource: "tasks",
+    filters: {
+      initial: [
+        {
+          field: "project_id",
+          value: project_id,
+          operator: "eq",
+        },
+      ],
+    },
     syncWithLocation: false,
   });
   const { mutate } = useCustomMutation();

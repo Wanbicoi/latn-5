@@ -4,6 +4,7 @@ CREATE OR REPLACE VIEW public_v2.tasks
 WITH
     (security_invoker = true) AS
 SELECT
+    t.project_id,
     ta.id,
     ws.name AS stage,
     JSONB_BUILD_OBJECT(
@@ -29,8 +30,11 @@ FROM
     public_v2._task_assignments ta
     JOIN public_v2._tasks t ON ta.task_id = t.id
     JOIN public_v2._workflow_stages ws ON ta.stage_id = ws.id
-    LEFT JOIN public_v2._users u ON ta.assigned_to = u.id
+    JOIN public_v2._users u ON ta.assigned_to = u.id
     JOIN public_v2._datasource_integrations di ON t.data_item_id = di.id
 WHERE
-    u IS NULL
-    OR u.is_system = false;
+    ta.status != 'COMPLETED'
+    AND (
+        u IS NULL
+        OR u.is_system = false
+    );
