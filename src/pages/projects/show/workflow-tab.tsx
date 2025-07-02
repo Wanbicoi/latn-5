@@ -2,7 +2,13 @@ import FormItemTable from "@/components/form-item/table";
 import WorkflowGraph from "@/components/workflow-graph";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import { useModalForm } from "@refinedev/antd";
-import { useCustomMutation, useList, useOne, useParsed } from "@refinedev/core";
+import {
+  useCustomMutation,
+  useInvalidate,
+  useList,
+  useOne,
+  useParsed,
+} from "@refinedev/core";
 import {
   Button,
   Flex,
@@ -64,21 +70,32 @@ export function WorkflowTab() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { mutate } = useCustomMutation({});
 
+  const invalidate = useInvalidate();
   // Save handler
   const handleSave = async () => {
-    mutate({
-      url: "workflows_create",
-      method: "post",
-      values: {
-        project_id: project_id,
-        nodes,
-        edges,
+    mutate(
+      {
+        url: "workflows_create",
+        method: "post",
+        values: {
+          project_id: project_id,
+          nodes,
+          edges,
+        },
+        successNotification: (data, values) => ({
+          message: `Workflow saved successfully`,
+          type: "success",
+        }),
       },
-      successNotification: (data, values) => ({
-        message: `Workflow saved successfully`,
-        type: "success",
-      }),
-    });
+      {
+        onSuccess: () => {
+          invalidate({
+            resource: "workflows",
+            invalidates: ["detail"],
+          });
+        },
+      }
+    );
   };
 
   useEffect(() => {
