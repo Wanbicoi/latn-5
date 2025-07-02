@@ -37,7 +37,7 @@ BEGIN
                     'COMPLETED'
                 );
             ELSE
-                INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to, status)
+                INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
                 VALUES (
                     p_task_id,
                     p_new_stage_id,
