@@ -58,7 +58,7 @@ export const TagsList = () => {
           <Table.Column
             dataIndex="created_at"
             title="Created At"
-            render={(value) => <DateField value={value} />}
+            render={(value) => <DateField value={value} format="LLL" />}
           />
           <Table.Column
             title="Actions"

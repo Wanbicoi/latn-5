@@ -76,7 +76,7 @@ export function TasksTab() {
           dataIndex: "created_at",
           key: "created_at",
           sorter: true,
-          render: (value: any) => <DateField value={value} />,
+          render: (value: any) => <DateField value={value} format="LLL" />,
         },
         {
           dataIndex: "actions",

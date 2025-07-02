@@ -33,7 +33,7 @@ export const ProjectsList = () => {
         <Table.Column
           dataIndex={["created_at"]}
           title="Created At"
-          render={(value: any) => <DateField value={value} />}
+          render={(value: any) => <DateField value={value} format="LLL" />}
         />
         <Table.Column
           dataIndex="actions"

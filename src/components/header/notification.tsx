@@ -246,7 +246,7 @@ export const NotificationComponent: React.FC<NotificationProps> = ({
               }}
               actions={[
                 getNotificationStatusTag(item.type),
-                <DateField value={item.created_at} />,
+                <DateField value={item.created_at} format="LLL" />,
                 <Button
                   size="small"
                   type="text"
