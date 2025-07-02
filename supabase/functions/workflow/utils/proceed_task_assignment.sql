@@ -28,12 +28,22 @@ BEGIN
         BEGIN
             v_next_assignee := public_v2.get_workflow_stage_next_assignee(p_new_stage_id);
 
-            INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
-            VALUES (
-                p_task_id,
-                p_new_stage_id,
-                v_next_assignee
-            );
+            IF v_next_assignee IN ('b366abf3-a925-4d7a-890c-0c00a7b86985', 'c7d7341f-536f-42d9-80ec-dea3ad2e18f5') THEN
+                INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to, status)
+                VALUES (
+                    p_task_id,
+                    p_new_stage_id,
+                    v_next_assignee,
+                    'COMPLETED'
+                );
+            ELSE
+                INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to, status)
+                VALUES (
+                    p_task_id,
+                    p_new_stage_id,
+                    v_next_assignee
+                );
+            END IF;
         END;
     END IF;
 END;

@@ -81,4 +81,7 @@ GROUP BY
     di.orthanc_uuid,
     di.data
 HAVING
-    BOOL_AND(ta.status = 'COMPLETED');
+    BOOL_AND(
+        ws.type = 'SUCCESS'
+        OR ta.status = 'COMPLETED'
+    );
