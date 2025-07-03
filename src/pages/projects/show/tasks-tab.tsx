@@ -1,3 +1,4 @@
+import { IdDisplay } from "@/components/id-display";
 import { ArrowRightOutlined, EyeOutlined } from "@ant-design/icons";
 import { DateField, useTable } from "@refinedev/antd";
 import { useCustomMutation, useInvalidate, useParsed } from "@refinedev/core";
@@ -27,6 +28,12 @@ export function TasksTab() {
       {...tableProps}
       rowKey="id"
       columns={[
+        {
+          title: "Id",
+          dataIndex: "id",
+          key: "id",
+          render: (value) => <IdDisplay id={value} />,
+        },
         {
           title: "Stage",
           dataIndex: "stage",

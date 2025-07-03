@@ -1,3 +1,4 @@
+import { IdDisplay } from "@/components/id-display";
 import {
   DateField,
   DeleteButton,
@@ -15,7 +16,11 @@ export const ProjectsList = () => {
   return (
     <List title="Projects">
       <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="id" title="Id" />
+        <Table.Column
+          dataIndex="id"
+          title="Id"
+          render={(value) => <IdDisplay id={value} />}
+        />
         <Table.Column dataIndex="name" title="Name" />
         <Table.Column
           title="Tags"

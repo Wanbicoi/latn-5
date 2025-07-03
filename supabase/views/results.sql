@@ -80,8 +80,3 @@ GROUP BY
     t.id,
     di.orthanc_uuid,
     di.data
-HAVING
-    BOOL_AND(
-        ws.type = 'SUCCESS'
-        OR ta.status = 'COMPLETED'
-    );

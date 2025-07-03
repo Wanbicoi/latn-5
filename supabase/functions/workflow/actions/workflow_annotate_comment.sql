@@ -1,8 +1,9 @@
-DROP FUNCTION IF EXISTS public_v2.workflow_annotate_comment (UUID);
+DROP FUNCTION IF EXISTS public_v2.workflow_annotate_comment (UUID, TEXT, TEXT, JSONB);
 
 CREATE OR REPLACE FUNCTION public_v2.workflow_annotate_comment (
     task_assignment_id UUID,
     comment TEXT,
+    series_instance_uid TEXT DEFAULT NULL,
     data JSONB DEFAULT '{}'
 ) RETURNS void AS $$
 DECLARE
@@ -20,9 +21,9 @@ BEGIN
     JOIN public_v2._tasks t ON ta.task_id = t.id
     WHERE ta.id = task_assignment_id;
 
-    -- Insert the comment into the _annotation_comments table
-    INSERT INTO public_v2._annotation_comments (task_assignment_id, author_id, comment, data)
-    VALUES (task_assignment_id, auth.uid(), comment, data);
+    -- Insert the comment into the _annotation_comments table with series_instance_uid
+    INSERT INTO public_v2._annotation_comments (task_assignment_id, author_id, comment, series_instance_uid, data)
+    VALUES (task_assignment_id, auth.uid(), comment, series_instance_uid, data);
 
     -- Check if the user has access to resource=workflow and action=review for this project
     IF public_v2.check_workflow_permission(task_assignment_id, 'workflow', 'review') THEN
