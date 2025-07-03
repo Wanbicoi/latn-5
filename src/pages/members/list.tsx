@@ -16,9 +16,6 @@ export const MembersList = () => {
   const { tableProps } = useTable<Member>({
     resource: "members",
     syncWithLocation: true,
-    meta: {
-      select: "id, full_name",
-    },
   });
   const {
     modalProps: editModalProps,
@@ -51,6 +48,7 @@ export const MembersList = () => {
       >
         <Table {...tableProps} rowKey="id">
           <Table.Column dataIndex="full_name" title="Full Name" />
+          <Table.Column dataIndex="email" title="Email" />
           <Table.Column
             render={(_, record: Member) => (
               <Space>

@@ -141,6 +141,7 @@ CREATE TABLE public_v2._users (
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     updated_at timestamp with time zone NOT NULL DEFAULT NOW(),
     is_system BOOLEAN NOT NULL DEFAULT false,
+    email TEXT,
     CONSTRAINT _users_pkey PRIMARY KEY (id),
     CONSTRAINT _users_id_fkey FOREIGN KEY (id) REFERENCES auth.users (id)
 );
