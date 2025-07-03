@@ -219,16 +219,14 @@ const authProvider: AuthProvider = {
     throw "Not implemented";
   },
   getIdentity: async () => {
-    const { data } = await supabaseClient.auth.getUser();
-
-    if (data?.user) {
-      return {
-        ...data.user,
-        name: data.user.email,
-      };
-    }
-
-    return null;
+    const { data } = await supabaseClient
+      .from("user_current")
+      .select("full_name, avatar_url")
+      .single();
+    return {
+      name: data?.full_name,
+      avatar: data?.avatar_url,
+    };
   },
 };
 

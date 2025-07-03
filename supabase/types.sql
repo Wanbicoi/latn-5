@@ -6,7 +6,8 @@ CREATE TYPE public_v2.notification_type AS ENUM(
     'ASSIGNMENT_CREATED',
     'STATUS_CHANGED',
     'MENTION',
-    'TIMEOUT_WARNING'
+    'TIMEOUT_WARNING',
+    'GENERAL',
 );
 
 CREATE TYPE public_v2.stage_type AS ENUM(

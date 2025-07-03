@@ -5,6 +5,7 @@ import { Button, Descriptions, Table, List, Typography, Avatar } from "antd";
 import { getColorFromChar } from "@/utils/get-color-from-char";
 import { getAssignmentStatusMeta } from "@/utils/assignment-status-color";
 import { Tag } from "antd";
+import { UserAvatar } from "@/components/avatar";
 
 export function ResultsTab() {
   const { id: project_id } = useParsed();
@@ -109,18 +110,7 @@ export function ResultsTab() {
               renderItem={(item: any) => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={
-                      <Avatar
-                        icon={!item.assigned_to && <UserOutlined />}
-                        style={{
-                          backgroundColor: item.assigned_to
-                            ? getColorFromChar(item.assigned_to)
-                            : undefined,
-                        }}
-                      >
-                        {item.assigned_to?.charAt(0)?.toUpperCase()}
-                      </Avatar>
-                    }
+                    avatar={<UserAvatar userName={item.assigned_to} />}
                     title={item.assigned_to || "System"}
                     description={
                       <Descriptions

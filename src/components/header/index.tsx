@@ -7,7 +7,6 @@ import type { RefineThemedLayoutV2HeaderProps } from "@refinedev/antd";
 import { useGetIdentity, useList } from "@refinedev/core";
 import {
   Layout as AntdLayout,
-  Avatar,
   Badge,
   Button,
   Space,
@@ -15,23 +14,18 @@ import {
   theme,
 } from "antd";
 import React from "react";
-import { NotificationComponent } from "./notification";
+import { NotificationComponent } from "./notifications";
 import { useOhifViewer } from "../../contexts/ohif-viewer";
+import { UserAvatar } from "../avatar";
 
 const { Text } = Typography;
 const { useToken } = theme;
-
-interface IUser {
-  id: number;
-  name: string;
-  avatar: string;
-}
 
 export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
   sticky = true,
 }) => {
   const { token } = useToken();
-  const { data: user } = useGetIdentity<IUser>();
+  const { data: user } = useGetIdentity<{ name: string }>();
   const { selectedTask, setSelectedTask } = useOhifViewer();
 
   const headerStyles: React.CSSProperties = {
@@ -72,8 +66,8 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
             />
           </Badge>
           <Space style={{ marginLeft: "8px" }} size="middle">
-            {user?.name && <Text strong>{user.name}</Text>}
-            {user?.avatar && <Avatar src={user?.avatar} alt={user?.name} />}
+            <UserAvatar userName={user?.name} />
+            <Text strong>{user?.name}</Text>
           </Space>
           {selectedTask && (
             <Button

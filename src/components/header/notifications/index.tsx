@@ -5,7 +5,6 @@ import {
   useSubscription,
 } from "@refinedev/core";
 import {
-  Avatar,
   Button,
   Drawer,
   List,
@@ -19,7 +18,6 @@ import type { MenuProps } from "antd";
 import { MenuInfo } from "rc-menu/lib/interface";
 import { DateField } from "@refinedev/antd";
 import {
-  UserOutlined,
   MoreOutlined,
   EyeOutlined,
   CloseOutlined,
@@ -28,8 +26,8 @@ import {
   EyeInvisibleOutlined,
 } from "@ant-design/icons";
 import { supabaseClient } from "@/utils";
-import { useOhifViewer } from "../../contexts/ohif-viewer";
-import { getColorFromChar } from "@/utils/get-color-from-char";
+import { useOhifViewer } from "../../../contexts/ohif-viewer";
+import { UserAvatar } from "../../avatar";
 const { useToken } = theme;
 
 interface NotificationProps {
@@ -105,11 +103,16 @@ export const NotificationComponent: React.FC<NotificationProps> = ({
   const handleViewedCheck = async (id: string, currentState: boolean) => {
     await supabaseClient
       .from("_notifications")
-      .update({ has_viewed: !currentState })
+      .update({ viewed: !currentState })
       .eq("id", id);
 
     invalidate({
       resource: "notifications",
+      invalidates: ["resourceAll"],
+    });
+
+    invalidate({
+      resource: "notifications_count",
       invalidates: ["resourceAll"],
     });
   };
@@ -132,7 +135,7 @@ export const NotificationComponent: React.FC<NotificationProps> = ({
       await supabaseClient
         .from("_notifications")
         .update({
-          has_viewed: true,
+          viewed: true,
         })
         .eq("id", notificationId);
       setSelectedItemForDeletion({ refId, notificationId });
@@ -140,7 +143,7 @@ export const NotificationComponent: React.FC<NotificationProps> = ({
       await supabaseClient
         .from("_notifications")
         .update({
-          has_viewed: true,
+          viewed: true,
           type: "SEGMENT_REQUEST_REMOVE_REJECTED",
         })
         .eq("id", notificationId);
@@ -240,7 +243,7 @@ export const NotificationComponent: React.FC<NotificationProps> = ({
           renderItem={(item: any) => (
             <List.Item
               style={{
-                backgroundColor: !item.has_viewed
+                backgroundColor: !item.viewed
                   ? token.colorFillQuaternary
                   : token.colorBgContainer,
               }}
@@ -251,11 +254,11 @@ export const NotificationComponent: React.FC<NotificationProps> = ({
                   size="small"
                   type="text"
                   icon={
-                    item.has_viewed ? <EyeInvisibleOutlined /> : <EyeOutlined />
+                    item.viewed ? <EyeInvisibleOutlined /> : <EyeOutlined />
                   }
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleViewedCheck(item.id, item.has_viewed);
+                    handleViewedCheck(item.id, item.viewed);
                   }}
                 />,
                 <Dropdown
@@ -282,18 +285,7 @@ export const NotificationComponent: React.FC<NotificationProps> = ({
               ]}
             >
               <List.Item.Meta
-                avatar={
-                  <Avatar
-                    icon={!item.user_name && <UserOutlined />}
-                    style={{
-                      backgroundColor: item.user_name
-                        ? getColorFromChar(item.user_name)
-                        : undefined,
-                    }}
-                  >
-                    {item.user_name?.charAt(0)?.toUpperCase()}
-                  </Avatar>
-                }
+                avatar={<UserAvatar userName={item.user_name} />}
                 title={item.user_name || "System"}
                 description={item.content}
               />

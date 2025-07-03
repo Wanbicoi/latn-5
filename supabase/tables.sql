@@ -37,7 +37,7 @@ CREATE TABLE public_v2._notifications (
     user_id UUID NOT NULL,
     type USER - DEFINED NOT NULL,
     payload JSONB,
-    is_read BOOLEAN NOT NULL DEFAULT false,
+    viewed BOOLEAN NOT NULL DEFAULT false,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     CONSTRAINT _notifications_pkey PRIMARY KEY (id),
     CONSTRAINT _notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES public_v2._users (id)
