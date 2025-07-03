@@ -86,6 +86,8 @@ export const RouterNode: React.FC<RouterNodeProps> = ({
           style={{
             top: `${(100 / (rules.length + 1)) * (idx + 1)}%`,
             background: "#d4380d",
+            width: 10,
+            height: 10,
           }}
         >
           <div style={{ fontSize: 10, color: "#d4380d", marginLeft: 18 }}>

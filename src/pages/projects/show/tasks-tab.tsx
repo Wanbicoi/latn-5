@@ -1,17 +1,10 @@
 import { IdDisplay } from "@/components/id-display";
-import { getAssignmentStatusMeta } from "@/utils/assignment-status-color";
+import { getAssignmentStatusTag } from "@/utils";
+import { getStageTag } from "@/utils/stage-color";
 import { ArrowRightOutlined, EyeOutlined } from "@ant-design/icons";
 import { DateField, useTable } from "@refinedev/antd";
 import { useCustomMutation, useInvalidate, useParsed } from "@refinedev/core";
-import {
-  Button,
-  Popconfirm,
-  Space,
-  Table,
-  Tooltip,
-  Descriptions,
-  Tag,
-} from "antd";
+import { Button, Descriptions, Popconfirm, Space, Table, Tooltip } from "antd";
 
 export function TasksTab() {
   const { id: project_id } = useParsed();
@@ -44,12 +37,6 @@ export function TasksTab() {
           render: (value) => <IdDisplay id={value} />,
         },
         {
-          title: "Stage",
-          dataIndex: "stage",
-          key: "stage",
-          sorter: true,
-        },
-        {
           title: "File",
           dataIndex: "file",
           key: "file",
@@ -80,12 +67,14 @@ export function TasksTab() {
           dataIndex: "status",
           key: "status",
           sorter: true,
-          render: (status: any) => {
-            if (!status) return "-";
-            const meta = getAssignmentStatusMeta(status);
-            if (!meta) return status;
-            return <Tag color={meta.color}>{meta.label}</Tag>;
-          },
+          render: (status: any) => getAssignmentStatusTag(status),
+        },
+        {
+          title: "Stage",
+          dataIndex: "stage",
+          key: "stage",
+          sorter: true,
+          render: (value) => getStageTag(value),
         },
         {
           title: "Assigned To",

@@ -1,11 +1,10 @@
-import { ArrowRightOutlined, UserOutlined } from "@ant-design/icons";
+import { UserAvatar } from "@/components/avatar";
+import { getAssignmentStatusTag } from "@/utils";
+import { getStageTag } from "@/utils/stage-color";
+import { ArrowRightOutlined } from "@ant-design/icons";
 import { DateField, useTable } from "@refinedev/antd";
 import { useParsed } from "@refinedev/core";
-import { Button, Descriptions, Table, List, Typography, Avatar } from "antd";
-import { getColorFromChar } from "@/utils/get-color-from-char";
-import { getAssignmentStatusMeta } from "@/utils/assignment-status-color";
-import { Tag } from "antd";
-import { UserAvatar } from "@/components/avatar";
+import { Button, Descriptions, List, Table, Typography } from "antd";
 
 export function ResultsTab() {
   const { id: project_id } = useParsed();
@@ -60,20 +59,15 @@ export function ResultsTab() {
           key: "latest_status",
           width: 200,
           sorter: true,
-          render: (status: any) => {
-            if (!status) return "-";
-            const meta = getAssignmentStatusMeta(status);
-            if (!meta) return status;
-            return <Tag color={meta.color}>{meta.label}</Tag>;
-          },
+          render: (status: any) => getAssignmentStatusTag(status),
         },
-
         {
           title: "Current Stage",
           dataIndex: "latest_stage_type",
           key: "latest_stage_type",
           width: 200,
           sorter: true,
+          render: (value) => getStageTag(value),
         },
         {
           title: "Completed At",
@@ -118,18 +112,14 @@ export function ResultsTab() {
                         column={3}
                         style={{ width: 800 }}
                       >
-                        <Descriptions.Item label="Stage">
-                          {item.stage ?? "-"}
-                        </Descriptions.Item>
                         <Descriptions.Item label="Status">
-                          {item.status ?? "-"}
+                          {getAssignmentStatusTag(item.status)}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Stage">
+                          {getStageTag(item.stage)}
                         </Descriptions.Item>
                         <Descriptions.Item label="Created At">
-                          {item.created_at ? (
-                            <DateField value={item.created_at} format="LLL" />
-                          ) : (
-                            "-"
-                          )}
+                          <DateField value={item.created_at} format="LLL" />
                         </Descriptions.Item>
                       </Descriptions>
                     }

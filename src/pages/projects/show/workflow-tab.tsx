@@ -10,6 +10,7 @@ import {
   useParsed,
 } from "@refinedev/core";
 import {
+  Badge,
   Button,
   Flex,
   Form,
@@ -32,6 +33,8 @@ type Workflow = {
   created_by?: string;
   created_at?: string;
   graph_data?: { nodes: Node[]; edges: Edge[] } | null;
+  data_count: number;
+  members_count: number;
 };
 
 export function WorkflowTab() {
@@ -111,7 +114,7 @@ export function WorkflowTab() {
   return (
     <Spin spinning={isLoading}>
       <Space direction="vertical" style={{ width: "100%" }}>
-        {!hasWorkflow && (
+        {!hasWorkflow ? (
           <Flex justify="space-between">
             <Space>
               <Button onClick={() => showMemberModal(project_id)}>
@@ -131,6 +134,33 @@ export function WorkflowTab() {
               <Button type="primary">Create Workflow</Button>
             </Popconfirm>
           </Flex>
+        ) : (
+          <Space>
+            <Button
+              onClick={() => showMemberModal(project_id)}
+              iconPosition="end"
+              icon={
+                <Badge
+                  count={workflow?.members_count}
+                  style={{ background: "#aaa" }}
+                />
+              }
+            >
+              Choose Project Members
+            </Button>
+            <Button
+              onClick={() => showDatasetsModal(project_id)}
+              iconPosition="end"
+              icon={
+                <Badge
+                  count={workflow?.data_count}
+                  style={{ background: "#aaa" }}
+                />
+              }
+            >
+              Choose Data for Annotate
+            </Button>
+          </Space>
         )}
         <WorkflowGraph
           editable={!hasWorkflow}

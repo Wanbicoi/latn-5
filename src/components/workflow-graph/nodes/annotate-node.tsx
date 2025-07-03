@@ -61,8 +61,16 @@ export const AnnotateNode: React.FC<AnnotateNodeProps> = ({
       <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
         {data.description}
       </div>
-      <Handle type="target" position={Position.Left} />
-      <Handle type="source" position={Position.Right} />
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{ width: 10, height: 10, background: "#bfbfbf" }}
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        style={{ width: 10, height: 10, background: "#bfbfbf" }}
+      />
       <Modal
         open={modalOpen}
         title="Configure Annotate Stage"

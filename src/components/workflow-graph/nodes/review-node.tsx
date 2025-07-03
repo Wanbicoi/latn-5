@@ -63,12 +63,16 @@ export const ReviewNode: React.FC<ReviewNodeProps> = ({
       <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
         {data.description}
       </div>
-      <Handle type="target" position={Position.Left} />
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{ width: 10, height: 10, background: "#bfbfbf" }}
+      />
       <Handle
         type="source"
         position={Position.Right}
         id="approve"
-        style={{ top: "30%", background: "#52c41a" }}
+        style={{ top: "30%", background: "#52c41a", width: 10, height: 10 }}
       >
         <div style={{ fontSize: 10, color: "#52c41a", marginLeft: 18 }}>
           Approve
@@ -78,7 +82,7 @@ export const ReviewNode: React.FC<ReviewNodeProps> = ({
         type="source"
         position={Position.Right}
         id="reject"
-        style={{ top: "70%", background: "#ff4d4f" }}
+        style={{ top: "70%", background: "#ff4d4f", width: 10, height: 10 }}
       >
         <div style={{ fontSize: 10, color: "#ff4d4f", marginLeft: 18 }}>
           Reject

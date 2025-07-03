@@ -30,7 +30,11 @@ export const StartNode: React.FC<StartNodeProps> = ({ data, selected }) => {
     >
       <PlayCircleOutlined style={{ fontSize: 24, color: "#52a2ff" }} />
       <div style={{ fontWeight: 600, marginTop: 8 }}>Start</div>
-      <Handle type="source" position={Position.Right} />
+      <Handle
+        type="source"
+        position={Position.Right}
+        style={{ width: 10, height: 10, background: "#bfbfbf" }}
+      />
     </Card>
   );
 };

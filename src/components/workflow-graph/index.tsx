@@ -9,6 +9,7 @@ import ReactFlow, {
   Connection,
   NodeChange,
   EdgeChange,
+  MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Button, Dropdown, Menu } from "antd";
@@ -38,6 +39,7 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   workflowId,
 }) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -69,6 +71,16 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
     setSelectedNodeId(null);
   };
 
+  const handleEdgeClick = useCallback((_: React.MouseEvent, edge: Edge) => {
+    setSelectedEdgeId(edge.id);
+  }, []);
+
+  const handleRemoveEdge = () => {
+    if (!selectedEdgeId) return;
+    setEdges((eds) => eds.filter((e) => e.id !== selectedEdgeId));
+    setSelectedEdgeId(null);
+  };
+
   if (nodes.length === 0 && !editable)
     return <div>No stages found for this workflow.</div>;
 
@@ -95,21 +107,18 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
           }}
         >
           <Dropdown
-            overlay={
-              <Menu
-                onClick={({ key }) =>
-                  handleAddNode(key as keyof typeof nodeTypes)
-                }
-                items={Object.keys(nodeTypes).map((key) => ({
-                  key,
-                  label:
-                    NODE_TYPE_META[key as keyof typeof nodeTypes]?.label || key,
-                  icon:
-                    NODE_TYPE_META[key as keyof typeof nodeTypes]?.icon ||
-                    undefined,
-                }))}
-              />
-            }
+            menu={{
+              onClick: ({ key }) =>
+                handleAddNode(key as keyof typeof nodeTypes),
+              items: Object.keys(nodeTypes).map((key) => ({
+                key,
+                label:
+                  NODE_TYPE_META[key as keyof typeof nodeTypes]?.label || key,
+                icon:
+                  NODE_TYPE_META[key as keyof typeof nodeTypes]?.icon ||
+                  undefined,
+              })),
+            }}
             trigger={["click"]}
           >
             <Button icon={<PlusOutlined />}>Add Stage</Button>
@@ -122,6 +131,14 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
           >
             Remove Node
           </Button>
+          <Button
+            icon={<DeleteOutlined />}
+            danger
+            disabled={!selectedEdgeId}
+            onClick={handleRemoveEdge}
+          >
+            Remove Edge
+          </Button>
         </div>
       )}
       <ReactFlow
@@ -131,8 +148,17 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
         onNodesChange={onNodesChange}
         onConnect={onConnect}
         onNodeClick={editable ? handleNodeClick : undefined}
+        onEdgeClick={editable ? handleEdgeClick : undefined}
         nodeTypes={nodeTypes}
         fitView
+        defaultEdgeOptions={{
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+          },
+          style: {
+            strokeWidth: 2,
+          },
+        }}
       >
         <Background />
         <MiniMap />
