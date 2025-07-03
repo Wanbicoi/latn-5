@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "psql-general",
+      "problemMatcher": [],
+      "label": "npm: psql-general"
+    },
+    {
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": [],
+      "label": "npm: dev",
+      "detail": "refine dev --port 3000"
+    },
+    {
+      "type": "shell",
+      "label": "Run current file with psql",
+      "command": "yarn",
+      "args": ["run", "psql", "${file}"],
+      "problemMatcher": []
+    }
+  ]
+}
