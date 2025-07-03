@@ -166,6 +166,7 @@ export const PermissionsList = () => {
     <List>
       <Table
         {...tableProps}
+        scroll={{ y: 600 }}
         size="small"
         columns={columns}
         dataSource={data}

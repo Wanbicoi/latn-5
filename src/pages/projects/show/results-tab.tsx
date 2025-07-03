@@ -3,6 +3,8 @@ import { DateField, useTable } from "@refinedev/antd";
 import { useParsed } from "@refinedev/core";
 import { Button, Descriptions, Table, List, Typography, Avatar } from "antd";
 import { getColorFromChar } from "@/utils/get-color-from-char";
+import { getAssignmentStatusMeta } from "@/utils/assignment-status-color";
+import { Tag } from "antd";
 
 export function ResultsTab() {
   const { id: project_id } = useParsed();
@@ -57,6 +59,12 @@ export function ResultsTab() {
           key: "latest_status",
           width: 200,
           sorter: true,
+          render: (status: any) => {
+            if (!status) return "-";
+            const meta = getAssignmentStatusMeta(status);
+            if (!meta) return status;
+            return <Tag color={meta.color}>{meta.label}</Tag>;
+          },
         },
 
         {
