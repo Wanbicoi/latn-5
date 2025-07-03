@@ -28,6 +28,7 @@ import {
 import { supabaseClient } from "@/utils";
 import { useOhifViewer } from "../../../contexts/ohif-viewer";
 import { UserAvatar } from "../../avatar";
+import { IdDisplay } from "@/components/id-display";
 const { useToken } = theme;
 
 interface NotificationProps {
@@ -287,7 +288,7 @@ export const NotificationComponent: React.FC<NotificationProps> = ({
               <List.Item.Meta
                 avatar={<UserAvatar userName={item.user_name} />}
                 title={item.user_name || "System"}
-                description={item.content}
+                description={<DisplayContent content={item.content} />}
               />
             </List.Item>
           )}
@@ -344,5 +345,22 @@ export const NotificationComponent: React.FC<NotificationProps> = ({
     </>
   );
 };
+
+function DisplayContent({ content }: { content: string }) {
+  // Replace #UUID in content with #<IdDisplay id=uuid length=3 />
+  const uuidRegex =
+    /#([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i;
+  const match = content.match(uuidRegex);
+  if (match) {
+    const [before, after] = content.split(match[0]);
+    return (
+      <>
+        {before}#<IdDisplay id={match[1]} length={3} />
+        {after}
+      </>
+    );
+  }
+  return content;
+}
 
 export default NotificationComponent;

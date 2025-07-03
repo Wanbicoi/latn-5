@@ -18,7 +18,7 @@ BEGIN
     VALUES (task_assignment_id, auth.uid(), comment, series_instance_uid, data);
 
 
-    public_v2.notifications_workflow_create(task_assignment_id);
+    PERFORM public_v2.notifications_workflow_create(task_assignment_id);
 
     -- Check if the user has access to resource=workflow and action=review for this project
     IF public_v2.check_workflow_permission(task_assignment_id, 'workflow', 'review') THEN

@@ -1,8 +1,17 @@
 import { IdDisplay } from "@/components/id-display";
+import { getAssignmentStatusMeta } from "@/utils/assignment-status-color";
 import { ArrowRightOutlined, EyeOutlined } from "@ant-design/icons";
 import { DateField, useTable } from "@refinedev/antd";
 import { useCustomMutation, useInvalidate, useParsed } from "@refinedev/core";
-import { Button, Popconfirm, Space, Table, Tooltip, Descriptions } from "antd";
+import {
+  Button,
+  Popconfirm,
+  Space,
+  Table,
+  Tooltip,
+  Descriptions,
+  Tag,
+} from "antd";
 
 export function TasksTab() {
   const { id: project_id } = useParsed();
@@ -71,6 +80,12 @@ export function TasksTab() {
           dataIndex: "status",
           key: "status",
           sorter: true,
+          render: (status: any) => {
+            if (!status) return "-";
+            const meta = getAssignmentStatusMeta(status);
+            if (!meta) return status;
+            return <Tag color={meta.color}>{meta.label}</Tag>;
+          },
         },
         {
           title: "Assigned To",
