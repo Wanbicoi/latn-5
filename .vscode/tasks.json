@@ -5,7 +5,7 @@
       "type": "npm",
       "script": "psql-general",
       "problemMatcher": [],
-      "label": "npm: psql-general"
+      "label": "Run general SQL"
     },
     {
       "type": "npm",
@@ -16,7 +16,7 @@
     },
     {
       "type": "shell",
-      "label": "Run current file with psql",
+      "label": "Apply current SQL file",
       "command": "yarn",
       "args": ["run", "psql", "${file}"],
       "problemMatcher": []
