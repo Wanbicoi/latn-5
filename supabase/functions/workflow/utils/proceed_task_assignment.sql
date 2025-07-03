@@ -44,6 +44,9 @@ BEGIN
                     v_next_assignee
                 );
             END IF;
+
+            -- Create notification for the next assignee
+            PERFORM public_v2.notifications_assignment_create(v_next_assignee, p_task_assignment_id);
         END;
     END IF;
 END;
