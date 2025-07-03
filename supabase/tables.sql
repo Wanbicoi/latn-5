@@ -7,6 +7,7 @@ CREATE TABLE public_v2._annotation_comments (
     comment TEXT,
     data JSONB NOT NULL DEFAULT '{}'::JSONB,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
+    series_instance_uid TEXT,
     CONSTRAINT _annotation_comments_pkey PRIMARY KEY (id),
     CONSTRAINT _annotation_comments_author_id_fkey FOREIGN KEY (author_id) REFERENCES public_v2._users (id),
     CONSTRAINT _annotation_comments_task_assignment_id_fkey FOREIGN KEY (task_assignment_id) REFERENCES public_v2._task_assignments (id)
@@ -14,7 +15,7 @@ CREATE TABLE public_v2._annotation_comments (
 
 CREATE TABLE public_v2._datasource_integrations (
     id UUID NOT NULL DEFAULT GEN_RANDOM_UUID(),
-    orthanc_uuid TEXT NOT NULL,
+    orthanc_uuid TEXT NOT NULL UNIQUE,
     data JSONB NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     CONSTRAINT _datasource_integrations_pkey PRIMARY KEY (id)
@@ -48,15 +49,16 @@ CREATE TABLE public_v2._project_members (
     role_id UUID NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     CONSTRAINT _project_members_pkey PRIMARY KEY (project_id, user_id),
+    CONSTRAINT _project_members_user_id_fkey FOREIGN KEY (user_id) REFERENCES public_v2._users (id),
     CONSTRAINT _project_members_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id),
-    CONSTRAINT _project_members_role_id_fkey FOREIGN KEY (role_id) REFERENCES public_v2._roles (id),
-    CONSTRAINT _project_members_user_id_fkey FOREIGN KEY (user_id) REFERENCES public_v2._users (id)
+    CONSTRAINT _project_members_role_id_fkey FOREIGN KEY (role_id) REFERENCES public_v2._roles (id)
 );
 
 CREATE TABLE public_v2._project_tags (
     id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
     name TEXT NOT NULL UNIQUE,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
+    color TEXT,
     CONSTRAINT _project_tags_pkey PRIMARY KEY (id)
 );
 
@@ -64,8 +66,8 @@ CREATE TABLE public_v2._project_to_tags (
     project_id UUID NOT NULL,
     tag_id BIGINT NOT NULL,
     CONSTRAINT _project_to_tags_pkey PRIMARY KEY (project_id, tag_id),
-    CONSTRAINT _project_to_tags_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id),
-    CONSTRAINT _project_to_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public_v2._project_tags (id)
+    CONSTRAINT _project_to_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public_v2._project_tags (id),
+    CONSTRAINT _project_to_tags_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id)
 );
 
 CREATE TABLE public_v2._projects (
@@ -126,9 +128,10 @@ CREATE TABLE public_v2._tasks (
     completed_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     segmentation_ids JSONB NOT NULL DEFAULT '[]'::JSONB,
+    status USER - DEFINED NOT NULL DEFAULT 'PENDING'::public_v2.task_status,
     CONSTRAINT _tasks_pkey PRIMARY KEY (id),
-    CONSTRAINT _tasks_data_item_id_fkey FOREIGN KEY (data_item_id) REFERENCES public_v2._datasource_integrations (id),
-    CONSTRAINT _tasks_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id)
+    CONSTRAINT _tasks_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id),
+    CONSTRAINT _tasks_data_item_id_fkey FOREIGN KEY (data_item_id) REFERENCES public_v2._datasource_integrations (id)
 );
 
 CREATE TABLE public_v2._users (
