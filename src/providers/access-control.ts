@@ -16,12 +16,6 @@ export const accessControlProvider = (): Required<IAccessControlContext> => {
         const { authenticated } = await authProvider.check();
         if (!authenticated) return { can: false };
 
-        // If not in local storage, fetch them from Supabase
-        // Get current user ID
-        const user = authProvider.getIdentity ? await authProvider.getIdentity() : null;
-        const userId = (user && typeof user === "object" && "id" in user) ? (user as { id: string }).id : null;
-        if (!userId) return { can: false };
-
         // Fetch permissions from the resource_access view for this user
         const { data } = await supabaseClient
           .from("resource_access")
