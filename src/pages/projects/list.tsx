@@ -7,11 +7,14 @@ import {
   ShowButton,
   useTable,
 } from "@refinedev/antd";
-import { BaseRecord } from "@refinedev/core";
+import { BaseRecord, useList } from "@refinedev/core";
 import { Space, Table, Tag } from "antd";
 
 export const ProjectsList = () => {
   const { tableProps } = useTable();
+
+  const { data } = useList({ resource: "project_tags" });
+  const project_tags = data?.data || [];
 
   return (
     <List title="Projects">
@@ -26,12 +29,15 @@ export const ProjectsList = () => {
           title="Tags"
           dataIndex="tags"
           render={(tags: any[]) => (
-            <Space wrap>
-              {tags?.map((tag) => (
-                <Tag key={tag.id} color={tag.color}>
-                  {tag.title}
-                </Tag>
-              ))}
+            <Space>
+              {tags?.map((id) => {
+                const tag = project_tags.find((t) => t.id === id);
+                return tag ? (
+                  <Tag key={tag.id} color={tag.color}>
+                    {tag.name}
+                  </Tag>
+                ) : null;
+              })}
             </Space>
           )}
         />

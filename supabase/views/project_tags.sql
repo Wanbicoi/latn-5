@@ -6,6 +6,7 @@ WITH
 SELECT
     id,
     name,
+    color,
     created_at
 FROM
     public_v2._project_tags;

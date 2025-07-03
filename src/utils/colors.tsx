@@ -39,8 +39,7 @@ export const getColorOptions = () => {
     value: color,
     label: (
       <Space>
-        <Tag color={color} style={{ width: 20, height: 20 }} />
-        {colorToName(color)}
+        <Tag color={color}>{colorToName(color)}</Tag>
       </Space>
     ),
   }));

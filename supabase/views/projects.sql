@@ -30,3 +30,5 @@ GROUP BY
     p.created_by,
     p.created_at,
     p.updated_at
+ORDER BY
+    p.created_at DESC;

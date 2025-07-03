@@ -16,7 +16,7 @@ export const TagsList = () => {
     show: createModalShow,
   } = useModalForm({
     action: "create",
-    resource: "hd_tags",
+    resource: "project_tags",
     redirect: false,
     successNotification: {
       message: "Tag created successfully",
@@ -31,7 +31,7 @@ export const TagsList = () => {
     show: editModalShow,
   } = useModalForm({
     action: "edit",
-    resource: "hd_tags",
+    resource: "project_tags",
     redirect: false,
     successNotification: {
       message: "Tag updated successfully",
@@ -49,10 +49,10 @@ export const TagsList = () => {
       >
         <Table {...tableProps} rowKey="id">
           <Table.Column
-            dataIndex="title"
-            title="Title"
+            dataIndex="name"
+            title="Name"
             render={(_, record: any) => (
-              <Tag color={record.color}>{record.title}</Tag>
+              <Tag color={record.color}>{record.name}</Tag>
             )}
           />
           <Table.Column
@@ -61,7 +61,6 @@ export const TagsList = () => {
             render={(value) => <DateField value={value} format="LLL" />}
           />
           <Table.Column
-            title="Actions"
             render={(_, record: any) => (
               <Space>
                 <EditButton
@@ -70,47 +69,55 @@ export const TagsList = () => {
                   recordItemId={record.id}
                   onClick={() => editModalShow(record.id)}
                 />
-                <DeleteButton
+                {/* <DeleteButton
                   hideText
                   size="small"
                   recordItemId={record.id}
-                  resource="hd_tags"
                   successNotification={{
                     message: "Tag deleted successfully",
                     type: "success",
                     undoableTimeout: 1500,
                   }}
-                />
+                /> */}
               </Space>
             )}
           />
         </Table>
       </List>
 
-      <Modal {...createModalProps} title="Create Tag">
+      <Modal {...createModalProps} title="Create Tag" width={400}>
         <Form {...createFormProps} layout="vertical">
-          <Form.Item label="Title" name="title" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Color"
-            name="color"
-            initialValue="#1890ff"
-            rules={[{ required: true }]}
-          >
-            <Select options={colorOptions} />
-          </Form.Item>
+          <Space>
+            <Form.Item label="Name" name="name" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Color"
+              name="color"
+              initialValue="#1890ff"
+              rules={[{ required: true }]}
+            >
+              <Select options={colorOptions} />
+            </Form.Item>
+          </Space>
         </Form>
       </Modal>
 
-      <Modal {...editModalProps} title="Edit Tag">
+      <Modal {...editModalProps} title="Edit Tag" width={400}>
         <Form {...editFormProps} layout="vertical">
-          <Form.Item label="Title" name="title" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="Color" name="color" rules={[{ required: true }]}>
-            <Select options={colorOptions} />
-          </Form.Item>
+          <Space>
+            <Form.Item label="Name" name="name" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Color"
+              name="color"
+              initialValue="#1890ff"
+              rules={[{ required: true }]}
+            >
+              <Select options={colorOptions} />
+            </Form.Item>
+          </Space>
         </Form>
       </Modal>
     </>
