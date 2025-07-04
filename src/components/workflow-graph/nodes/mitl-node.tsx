@@ -1,8 +1,9 @@
 // MitlNode with configuration UI for api_endpoint
 import React, { useState } from "react";
 import { Handle, Position } from "reactflow";
-import { ApiOutlined, SettingOutlined } from "@ant-design/icons";
+import { SettingOutlined } from "@ant-design/icons";
 import { Card, Modal, Form, Input } from "antd";
+import { WORKFLOW_STAGE_META } from "@/utils/stage-color";
 
 type MitlNodeProps = {
   id: string;
@@ -15,6 +16,9 @@ type MitlNodeProps = {
   };
   selected: boolean;
 };
+
+const META = WORKFLOW_STAGE_META.MITL;
+const BACKGROUND_COLOR = "#fff0f6";
 
 export const MitlNode: React.FC<MitlNodeProps> = ({ id, data, selected }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -38,17 +42,19 @@ export const MitlNode: React.FC<MitlNodeProps> = ({ id, data, selected }) => {
     <Card
       size="small"
       style={{
-        border: "2px solid #722ed1",
-        background: "#f9f0ff",
+        border: `2px solid ${META.color}`,
+        background: BACKGROUND_COLOR,
         minWidth: 180,
         textAlign: "center",
-        boxShadow: selected ? "0 0 0 2px #722ed1" : undefined,
+        boxShadow: selected ? `0 0 0 2px ${META.color}` : undefined,
       }}
       bodyStyle={{ padding: 12, position: "relative" }}
     >
-      <ApiOutlined style={{ fontSize: 24, color: "#722ed1" }} />
+      {React.cloneElement(META.icon, {
+        style: { fontSize: 24, color: META.color },
+      })}
       <div style={{ fontWeight: 600, marginTop: 8 }}>
-        {data.name || "MITL"}
+        {data.name || META.label}
         <SettingOutlined
           style={{ marginLeft: 8, cursor: "pointer", fontSize: 16 }}
           onClick={handleOpen}
@@ -60,12 +66,12 @@ export const MitlNode: React.FC<MitlNodeProps> = ({ id, data, selected }) => {
       <Handle
         type="target"
         position={Position.Left}
-        style={{ width: 10, height: 10, background: "#bfbfbf" }}
+        style={{ width: 10, height: 10, background: META.color }}
       />
       <Handle
         type="source"
         position={Position.Right}
-        style={{ width: 10, height: 10, background: "#bfbfbf" }}
+        style={{ width: 10, height: 10, background: META.color }}
       />
       <Modal
         open={modalOpen}

@@ -1,42 +1,34 @@
-// SuccessNode: terminal node for workflow completion
 import React from "react";
 import { Handle, Position } from "reactflow";
-import { CheckCircleTwoTone } from "@ant-design/icons";
 import { Card } from "antd";
+import { WORKFLOW_STAGE_META } from "@/utils/stage-color";
 
 type SuccessNodeProps = {
-  id: string;
-  data: {
-    name?: string;
-    description?: string;
-    workflow_id?: string;
-  };
   selected: boolean;
 };
 
-export const SuccessNode: React.FC<SuccessNodeProps> = ({ data, selected }) => (
+const META = WORKFLOW_STAGE_META.SUCCESS;
+const BACKGROUND_COLOR = "#f6ffed";
+
+export const SuccessNode: React.FC<SuccessNodeProps> = ({ selected }) => (
   <Card
     size="small"
     style={{
-      border: "2px solid #52c41a",
-      background: "#f6ffed",
+      border: `2px solid ${META.color}`,
+      background: BACKGROUND_COLOR,
       minWidth: 160,
       textAlign: "center",
-      boxShadow: selected ? "0 0 0 2px #52c41a" : undefined,
+      boxShadow: selected ? `0 0 0 2px ${META.color}` : undefined,
     }}
-    bodyStyle={{ padding: 12, position: "relative" }}
   >
-    <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: 28 }} />
-    <div style={{ fontWeight: 600, marginTop: 8 }}>
-      {data.name || "Success"}
-    </div>
-    <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
-      {data.description}
-    </div>
+    {React.cloneElement(META.icon, {
+      style: { fontSize: 28, color: META.color },
+    })}
+    <div style={{ fontWeight: 600, marginTop: 8 }}>{META.label}</div>
     <Handle
       type="target"
       position={Position.Left}
-      style={{ width: 10, height: 10, background: "#bfbfbf" }}
+      style={{ width: 10, height: 10, background: META.color }}
     />
   </Card>
 );

@@ -174,7 +174,6 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
         }}
       >
         <Background />
-        <MiniMap />
         <Controls />
       </ReactFlow>
     </div>

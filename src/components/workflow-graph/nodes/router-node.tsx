@@ -1,7 +1,8 @@
-import { BranchesOutlined, SettingOutlined } from "@ant-design/icons";
+import { SettingOutlined } from "@ant-design/icons";
 import { Button, Card, Form, InputNumber, Modal, Space } from "antd";
 import React from "react";
 import { Handle, Position } from "reactflow";
+import { WORKFLOW_STAGE_META } from "@/utils/stage-color";
 
 type RouterNodeProps = {
   selected: boolean;
@@ -11,6 +12,9 @@ type RouterNodeProps = {
     onChange?: (data: any) => void;
   };
 };
+
+const META = WORKFLOW_STAGE_META.ROUTER;
+const BACKGROUND_COLOR = "#f5f5f5";
 
 export const RouterNode: React.FC<RouterNodeProps> = ({ selected, data }) => {
   const [form] = Form.useForm();
@@ -28,16 +32,18 @@ export const RouterNode: React.FC<RouterNodeProps> = ({ selected, data }) => {
     <Card
       size="small"
       style={{
-        border: "2px solid #d4380d",
-        background: "#fff2e8",
+        border: `2px solid ${META.color}`,
+        background: BACKGROUND_COLOR,
         minWidth: 200,
         textAlign: "center",
-        boxShadow: selected ? "0 0 0 2px #d4380d" : undefined,
+        boxShadow: selected ? `0 0 0 2px ${META.color}` : undefined,
       }}
     >
-      <BranchesOutlined style={{ fontSize: 24, color: "#d4380d" }} />
+      {React.cloneElement(META.icon, {
+        style: { fontSize: 24, color: META.color },
+      })}
       <div style={{ fontWeight: 600, marginTop: 8 }}>
-        Router ({`${data.route1}`}/{100 - data.route1!})
+        {META.label} ({`${data.route1}`}/{100 - data.route1!})
         <Button
           shape="circle"
           type="text"
@@ -49,7 +55,7 @@ export const RouterNode: React.FC<RouterNodeProps> = ({ selected, data }) => {
         type="target"
         position={Position.Left}
         style={{
-          background: "#d4380d",
+          background: META.color,
           width: 10,
           height: 10,
         }}
@@ -58,7 +64,7 @@ export const RouterNode: React.FC<RouterNodeProps> = ({ selected, data }) => {
         type="source"
         position={Position.Right}
         style={{
-          background: "#d4380d",
+          background: META.color,
           width: 10,
           height: 10,
           top: "70%",
@@ -66,7 +72,12 @@ export const RouterNode: React.FC<RouterNodeProps> = ({ selected, data }) => {
         id="approve"
       >
         <div
-          style={{ fontSize: 10, color: "#d4380d", marginLeft: 12, width: 40 }}
+          style={{
+            fontSize: 10,
+            color: META.color,
+            marginLeft: 12,
+            width: 40,
+          }}
         >
           Route 2
         </div>
@@ -75,7 +86,7 @@ export const RouterNode: React.FC<RouterNodeProps> = ({ selected, data }) => {
         type="source"
         position={Position.Right}
         style={{
-          background: "#d4380d",
+          background: META.color,
           width: 10,
           height: 10,
           top: "30%",
@@ -83,7 +94,12 @@ export const RouterNode: React.FC<RouterNodeProps> = ({ selected, data }) => {
         id="reject"
       >
         <div
-          style={{ fontSize: 10, color: "#d4380d", marginLeft: 12, width: 40 }}
+          style={{
+            fontSize: 10,
+            color: META.color,
+            marginLeft: 12,
+            width: 40,
+          }}
         >
           Route 1
         </div>
