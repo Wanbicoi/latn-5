@@ -6,7 +6,7 @@ WITH
 SELECT
     t.project_id,
     ta.id,
-    ws.name AS stage,
+    ws.type AS stage,
     JSONB_BUILD_OBJECT(
         'orthanc_uuid',
         di.orthanc_uuid,

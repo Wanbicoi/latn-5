@@ -36,7 +36,6 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   setEdges,
   onEdgesChange,
   onNodesChange,
-  workflowId,
 }) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
@@ -49,12 +48,25 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   const handleAddNode = (type: keyof typeof nodeTypes) => {
     const newNode: Node = {
       id: uuidv4(),
-      data: { label: type },
+      data: {},
       position: { x: 100, y: 100 + nodes.length * 80 },
       type,
     };
     setNodes((nds) => [...nds, newNode]);
   };
+
+  const handleNodeDataChange = useCallback(
+    (nodeId: string, newData: any) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId
+            ? { ...node, data: { ...node.data, ...newData } }
+            : node
+        )
+      );
+    },
+    [setNodes]
+  );
 
   const handleNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     setSelectedNodeId(node.id);
@@ -82,14 +94,13 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   };
 
   if (nodes.length === 0 && !editable)
-    return <div>No stages found for this workflow.</div>;
+    return <>No stages found for this workflow.</>;
 
-  // Inject workflow_id into each node's data
   const nodesWithWorkflowId = nodes.map((node) => ({
     ...node,
     data: {
       ...node.data,
-      workflow_id: workflowId,
+      onChange: (newData: any) => handleNodeDataChange(node.id, newData),
     },
   }));
 

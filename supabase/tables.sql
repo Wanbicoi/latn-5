@@ -94,8 +94,8 @@ CREATE TABLE public_v2._role_resources (
     role_id UUID NOT NULL,
     resource_id UUID NOT NULL,
     CONSTRAINT _role_resources_pkey PRIMARY KEY (role_id, resource_id),
-    CONSTRAINT _role_resources_role_id_fkey FOREIGN KEY (role_id) REFERENCES public_v2._roles (id),
-    CONSTRAINT _role_resources_resource_id_fkey FOREIGN KEY (resource_id) REFERENCES public_v2._resources (id)
+    CONSTRAINT _role_resources_resource_id_fkey FOREIGN KEY (resource_id) REFERENCES public_v2._resources (id),
+    CONSTRAINT _role_resources_role_id_fkey FOREIGN KEY (role_id) REFERENCES public_v2._roles (id)
 );
 
 CREATE TABLE public_v2._roles (
@@ -155,15 +155,13 @@ CREATE TABLE public_v2._workflow_stage_functions (
 CREATE TABLE public_v2._workflow_stages (
     id UUID NOT NULL DEFAULT GEN_RANDOM_UUID(),
     workflow_id UUID,
-    name CHARACTER VARYING NOT NULL,
-    description TEXT,
     type USER - DEFINED NOT NULL,
-    config JSONB NOT NULL DEFAULT '{}'::JSONB,
+    custom_config JSONB NOT NULL DEFAULT '{}'::JSONB,
     on_success_stage_id UUID,
     on_failure_stage_id UUID,
     CONSTRAINT _workflow_stages_pkey PRIMARY KEY (id),
-    CONSTRAINT _workflow_stages_on_success_stage_id_fkey FOREIGN KEY (on_success_stage_id) REFERENCES public_v2._workflow_stages (id),
     CONSTRAINT _workflow_stages_on_failure_stage_id_fkey FOREIGN KEY (on_failure_stage_id) REFERENCES public_v2._workflow_stages (id),
+    CONSTRAINT _workflow_stages_on_success_stage_id_fkey FOREIGN KEY (on_success_stage_id) REFERENCES public_v2._workflow_stages (id),
     CONSTRAINT _workflow_stages_workflow_id_fkey FOREIGN KEY (workflow_id) REFERENCES public_v2._workflows (id)
 );
 

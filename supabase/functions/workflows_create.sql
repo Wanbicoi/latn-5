@@ -23,11 +23,11 @@ BEGIN
     LOOP
         -- Only insert if type is a valid stage_type
         IF (node_obj.node->>'type')::public_v2.stage_type IS NOT NULL THEN
-            INSERT INTO public_v2._workflow_stages (workflow_id, "name", "type")
+            INSERT INTO public_v2._workflow_stages (workflow_id, "type", custom_config)
             VALUES (
                 p_workflow_id,
-                node_obj.node->'data'->>'label',
-                (node_obj.node->>'type')::text::public_v2.stage_type
+                (node_obj.node->>'type')::text::public_v2.stage_type,
+                node_obj.node->'data'
             )
             RETURNING id INTO stage_id_var;
 
