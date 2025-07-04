@@ -33,7 +33,7 @@ export const StartNode: React.FC<StartNodeProps> = ({ data, selected }) => {
       <Handle
         type="source"
         position={Position.Right}
-        style={{ width: 10, height: 10, background: "#bfbfbf" }}
+        style={{ width: 10, height: 10, background: "#1890ff" }}
       />
     </Card>
   );

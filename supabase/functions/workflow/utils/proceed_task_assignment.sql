@@ -43,10 +43,11 @@ BEGIN
                     p_new_stage_id,
                     v_next_assignee
                 );
-            END IF;
 
-            -- Create notification for the next assignee
-            PERFORM public_v2.notifications_assignment_create(v_next_assignee, p_task_assignment_id);
+                IF v_next_assignee IS NOT NULL THEN
+                    PERFORM public_v2.notifications_assignment_create(v_next_assignee, p_task_assignment_id);
+                END IF;
+            END IF;
         END;
     END IF;
 END;

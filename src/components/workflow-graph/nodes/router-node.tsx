@@ -1,57 +1,28 @@
-// RouterNode with dynamic rules configuration and output handles
-import React, { useState } from "react";
+import { BranchesOutlined, SettingOutlined } from "@ant-design/icons";
+import { Button, Card, Form, InputNumber, Modal, Space } from "antd";
+import React from "react";
 import { Handle, Position } from "reactflow";
-import {
-  BranchesOutlined,
-  SettingOutlined,
-  PlusOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
-import { Card, Modal, Form, Input, Button, Space } from "antd";
-
-type Rule = {
-  condition: string;
-  label?: string;
-};
 
 type RouterNodeProps = {
-  id: string;
-  data: {
-    rules?: Rule[];
-    name?: string;
-    description?: string;
-    onChange?: (data: any) => void;
-    workflow_id?: string;
-  };
   selected: boolean;
+  data: {
+    route1: number;
+    route2: number;
+    onChange?: (data: any) => void;
+  };
 };
 
-export const RouterNode: React.FC<RouterNodeProps> = ({
-  id,
-  data,
-  selected,
-}) => {
-  const [modalOpen, setModalOpen] = useState(false);
+export const RouterNode: React.FC<RouterNodeProps> = ({ selected, data }) => {
   const [form] = Form.useForm();
+  const [modal, setModal] = React.useState(false);
 
-  const handleOpen = () => {
-    form.setFieldsValue({
-      rules:
-        data.rules && data.rules.length > 0 ? data.rules : [{ condition: "" }],
-    });
-    setModalOpen(true);
-  };
-
-  const handleSave = () => {
-    form.validateFields().then((values) => {
-      data.onChange?.(values);
-      setModalOpen(false);
-    });
-  };
-
-  // Render dynamic output handles for each rule
-  const rules: Rule[] =
-    data.rules && data.rules.length > 0 ? data.rules : [{ condition: "" }];
+  const route1 = Form.useWatch("route1", form);
+  React.useEffect(() => {
+    if (route1 !== undefined) {
+      const route2 = 100 - route1;
+      form.setFieldsValue({ route2 });
+    }
+  }, [route1, form]);
 
   return (
     <Card
@@ -63,98 +34,81 @@ export const RouterNode: React.FC<RouterNodeProps> = ({
         textAlign: "center",
         boxShadow: selected ? "0 0 0 2px #d4380d" : undefined,
       }}
-      bodyStyle={{ padding: 12, position: "relative" }}
     >
       <BranchesOutlined style={{ fontSize: 24, color: "#d4380d" }} />
       <div style={{ fontWeight: 600, marginTop: 8 }}>
-        {data.name || "Router"}
-        <SettingOutlined
-          style={{ marginLeft: 8, cursor: "pointer", fontSize: 16 }}
-          onClick={handleOpen}
+        Router ({`${data.route1}`}/{100 - data.route1!})
+        <Button
+          shape="circle"
+          type="text"
+          onClick={() => setModal(true)}
+          icon={<SettingOutlined />}
         />
       </div>
-      <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
-        {data.description}
-      </div>
-      <Handle type="target" position={Position.Left} />
-      {rules.map((rule, idx) => (
-        <Handle
-          key={idx}
-          type="source"
-          position={Position.Right}
-          id={`rule-${idx}`}
-          style={{
-            top: `${(100 / (rules.length + 1)) * (idx + 1)}%`,
-            background: "#d4380d",
-            width: 10,
-            height: 10,
-          }}
-        >
-          <div style={{ fontSize: 10, color: "#d4380d", marginLeft: 18 }}>
-            {rule.condition ? rule.condition : `Rule ${idx + 1}`}
-          </div>
-        </Handle>
-      ))}
-      <Modal
-        open={modalOpen}
-        title="Configure Router Stage"
-        onCancel={() => setModalOpen(false)}
-        onOk={handleSave}
-        okText="Save"
-        cancelText="Cancel"
-        destroyOnClose
-        width={480}
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{
+          background: "#d4380d",
+          width: 10,
+          height: 10,
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        style={{
+          background: "#d4380d",
+          width: 10,
+          height: 10,
+          top: "70%",
+        }}
+        id="approve"
       >
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={{
-            rules:
-              data.rules && data.rules.length > 0
-                ? data.rules
-                : [{ condition: "" }],
-          }}
+        <div
+          style={{ fontSize: 10, color: "#d4380d", marginLeft: 12, width: 40 }}
         >
-          <Form.List name="rules">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map((field, idx) => (
-                  <Space
-                    key={field.key}
-                    align="baseline"
-                    style={{ display: "flex", marginBottom: 8 }}
-                  >
-                    <Form.Item
-                      {...field}
-                      label={idx === 0 ? "Condition" : ""}
-                      name={[field.name, "condition"]}
-                      rules={[
-                        { required: true, message: "Please enter a condition" },
-                      ]}
-                    >
-                      <Input placeholder="Condition" />
-                    </Form.Item>
-                    {fields.length > 1 && (
-                      <Button
-                        icon={<DeleteOutlined />}
-                        onClick={() => remove(field.name)}
-                        type="text"
-                        danger
-                      />
-                    )}
-                  </Space>
-                ))}
-                <Button
-                  icon={<PlusOutlined />}
-                  onClick={() => add({ condition: "" })}
-                  type="dashed"
-                  block
-                >
-                  Add Rule
-                </Button>
-              </>
-            )}
-          </Form.List>
+          Route 2
+        </div>
+      </Handle>
+      <Handle
+        type="source"
+        position={Position.Right}
+        style={{
+          background: "#d4380d",
+          width: 10,
+          height: 10,
+          top: "30%",
+        }}
+        id="reject"
+      >
+        <div
+          style={{ fontSize: 10, color: "#d4380d", marginLeft: 12, width: 40 }}
+        >
+          Route 1
+        </div>
+      </Handle>
+      <Modal
+        title="Configure Router Stage"
+        width={400}
+        open={modal}
+        onCancel={() => setModal(false)}
+        onOk={() => {
+          form.validateFields().then((values) => {
+            data.onChange?.(values);
+            setModal(false);
+          });
+        }}
+      >
+        <Form form={form} initialValues={data}>
+          <Space>
+            <Form.Item label="Route 1" name="route1">
+              <InputNumber step={5} suffix="%" />
+            </Form.Item>
+            <Form.Item label="Route 2" name="route2">
+              <InputNumber disabled step={5} suffix="%" />
+            </Form.Item>
+          </Space>
         </Form>
       </Modal>
     </Card>

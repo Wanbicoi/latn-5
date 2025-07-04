@@ -85,7 +85,7 @@ export function WorkflowTab() {
           nodes,
           edges,
         },
-        successNotification: (data, values) => ({
+        successNotification: () => ({
           message: `Workflow saved successfully`,
           type: "success",
         }),
@@ -94,7 +94,7 @@ export function WorkflowTab() {
         onSuccess: () => {
           invalidate({
             resource: "workflows",
-            invalidates: ["detail"],
+            invalidates: ["all"],
           });
         },
       }

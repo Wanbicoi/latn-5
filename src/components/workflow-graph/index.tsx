@@ -46,9 +46,11 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   );
 
   const handleAddNode = (type: keyof typeof nodeTypes) => {
+    var data = {};
+    if (type == "ROUTER") data = { route1: 30, route2: 70 };
     const newNode: Node = {
       id: uuidv4(),
-      data: {},
+      data,
       position: { x: 100, y: 100 + nodes.length * 80 },
       type,
     };
