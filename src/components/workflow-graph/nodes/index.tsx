@@ -3,21 +3,10 @@ import { ReviewNode } from "./review-node";
 import { ConsensusNode } from "./consensus-node";
 import { MitlNode } from "./mitl-node";
 import { RouterNode } from "./router-node";
-import { DatasourceNode } from "./datasource-node";
 import { SuccessNode } from "./success-node";
 import { ArchivedNode } from "./archived-node";
 import { StartNode } from "./start-node";
-import {
-  EditOutlined,
-  EyeOutlined,
-  TeamOutlined,
-  ApiOutlined,
-  BranchesOutlined,
-  DatabaseOutlined,
-  CheckCircleTwoTone,
-  InboxOutlined,
-  PlayCircleOutlined,
-} from "@ant-design/icons";
+import { WORKFLOW_STAGE_META, WorkflowStage } from "@/utils/stage-color";
 
 export const nodeTypes = {
   START: StartNode,
@@ -26,49 +15,17 @@ export const nodeTypes = {
   CONSENSUS: ConsensusNode,
   MITL: MitlNode,
   ROUTER: RouterNode,
-  DATASOURCE: DatasourceNode,
   SUCCESS: SuccessNode,
   ARCHIVED: ArchivedNode,
 };
 
 export const NODE_TYPE_META: Record<
-  keyof typeof nodeTypes,
+  WorkflowStage,
   { label: string; icon: React.ReactNode }
-> = {
-  START: {
-    label: "Start",
-    icon: <PlayCircleOutlined style={{ color: "#52a2ff" }} />,
+> = Object.entries(WORKFLOW_STAGE_META).reduce(
+  (acc, [key, { label, iconWithColor }]) => {
+    acc[key as WorkflowStage] = { label, icon: iconWithColor };
+    return acc;
   },
-  ANNOTATE: {
-    label: "Annotate",
-    icon: <EditOutlined style={{ color: "#1890ff" }} />,
-  },
-  REVIEW: {
-    label: "Review",
-    icon: <EyeOutlined style={{ color: "#52c41a" }} />,
-  },
-  CONSENSUS: {
-    label: "Consensus",
-    icon: <TeamOutlined style={{ color: "#faad14" }} />,
-  },
-  MITL: {
-    label: "MITL",
-    icon: <ApiOutlined style={{ color: "#722ed1" }} />,
-  },
-  ROUTER: {
-    label: "Router",
-    icon: <BranchesOutlined style={{ color: "#d4380d" }} />,
-  },
-  DATASOURCE: {
-    label: "Datasource",
-    icon: <DatabaseOutlined style={{ color: "#13c2c2" }} />,
-  },
-  SUCCESS: {
-    label: "Success",
-    icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
-  },
-  ARCHIVED: {
-    label: "Archived",
-    icon: <InboxOutlined style={{ color: "#bfbfbf" }} />,
-  },
-};
+  {} as Record<WorkflowStage, { label: string; icon: React.ReactNode }>
+);
