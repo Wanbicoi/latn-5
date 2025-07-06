@@ -40,6 +40,39 @@ This document outlines the technical standards for the data annotation platform.
       AS
       SELECT ...;
       ```
+## 2.1. Test File Template (Supabase)
+
+When creating a new test file in `supabase/tests/`, use the following template to ensure consistency and reliability:
+
+```sql
+begin;
+
+select
+    plan (<number_of_tests>);
+
+select
+    tests.create_supabase_user ('user1@test.com');
+select
+    tests.authenticate_as ('user1@test.com');
+
+-- Create resource and store its id in a temp table if we need to create anything
+create temp table test_resource as
+select public_v2.<create_function>(<args>) as id;
+
+select
+    results_eq (
+        $$select <fields> from public_v2.<view> where id = (select id from test_resource)$$, -- ALWAYS use $$ instead of '
+        $$VALUES (<expected_values>)$$, -- ALWAYS use $$ instead of '
+        '<test description>'
+    );
+
+select * from finish ();
+rollback;
+```
+
+- Always use a temp table to store the created resource ID for later steps.
+- Use direct `select` statements for update and delete operations.
+- Explicitly cast values in assertions to match view column types (e.g., `::varchar`).
 
 ## 3. Frontend Development (React & Refine)
 

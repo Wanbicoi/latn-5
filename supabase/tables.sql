@@ -54,19 +54,19 @@ CREATE TABLE public_v2._project_members (
     CONSTRAINT _project_members_role_id_fkey FOREIGN KEY (role_id) REFERENCES public_v2._roles (id)
 );
 
-CREATE TABLE public_v2._project_tags (
+CREATE TABLE public_v2._tags (
     id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
     name TEXT NOT NULL UNIQUE,
     created_at timestamp with time zone NOT NULL DEFAULT NOW(),
     color TEXT,
-    CONSTRAINT _project_tags_pkey PRIMARY KEY (id)
+    CONSTRAINT _tags_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE public_v2._project_to_tags (
     project_id UUID NOT NULL,
     tag_id BIGINT NOT NULL,
     CONSTRAINT _project_to_tags_pkey PRIMARY KEY (project_id, tag_id),
-    CONSTRAINT _project_to_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public_v2._project_tags (id),
+    CONSTRAINT _project_to_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public_v2._tags (id),
     CONSTRAINT _project_to_tags_project_id_fkey FOREIGN KEY (project_id) REFERENCES public_v2._projects (id)
 );
 

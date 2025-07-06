@@ -24,29 +24,33 @@ BEGIN
 
         -- Get next assignee
         DECLARE
-            v_next_assignee UUID;
+            v_next_assignees UUID[];
         BEGIN
-            v_next_assignee := public_v2.get_workflow_stage_next_assignee(p_new_stage_id);
+            v_next_assignees := public_v2.get_workflow_stage_next_assignees(p_new_stage_id);
 
-            IF v_next_assignee IN ('b366abf3-a925-4d7a-890c-0c00a7b86985', 'c7d7341f-536f-42d9-80ec-dea3ad2e18f5') THEN
-                INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to, status)
+            IF COALESCE(array_length(v_next_assignees, 1), 0) = 0 THEN
+                INSERT INTO public_v2._task_assignments (task_id, stage_id, status)
                 VALUES (
                     p_task_id,
                     p_new_stage_id,
-                    v_next_assignee,
                     'COMPLETED'
                 );
             ELSE
-                INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
-                VALUES (
-                    p_task_id,
-                    p_new_stage_id,
-                    v_next_assignee
-                );
+                DECLARE
+                    v_next_assignee UUID;
+                BEGIN
+                    FOREACH v_next_assignee IN ARRAY v_next_assignees
+                    LOOP
+                        INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
+                        VALUES (
+                            p_task_id,
+                            p_new_stage_id,
+                            v_next_assignee
+                        );
 
-                IF v_next_assignee IS NOT NULL THEN
-                    PERFORM public_v2.notifications_assignment_create(v_next_assignee, p_task_assignment_id);
-                END IF;
+                        PERFORM public_v2.notifications_assignment_create(v_next_assignee, p_task_assignment_id);
+                    END LOOP;
+                END;
             END IF;
         END;
     END IF;

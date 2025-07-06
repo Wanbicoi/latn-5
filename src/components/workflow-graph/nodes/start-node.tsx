@@ -1,37 +1,28 @@
 // StartNode: entry node for selected data to be annotated
 import React from "react";
-import { Card } from "antd";
-import { Handle, Position } from "reactflow";
+import { NodeProps, Position } from "@xyflow/react";
 import { WORKFLOW_STAGE_META } from "@/utils/stage-color";
-
-type StartNodeProps = {
-  selected: boolean;
-};
+import { BaseNode } from "./base-node";
 
 const META = WORKFLOW_STAGE_META.START;
-const BACKGROUND_COLOR = "#f0f5ff";
 
-export const StartNode: React.FC<StartNodeProps> = ({ selected }) => {
+export const StartNode: React.FC<NodeProps> = ({ data, selected }) => {
   return (
-    <Card
-      size="small"
-      style={{
-        border: `2px solid ${META.color}`,
-        background: BACKGROUND_COLOR,
-        minWidth: 180,
-        textAlign: "center",
-        boxShadow: selected ? `0 0 0 2px ${META.color}` : undefined,
+    <BaseNode
+      selected={selected}
+      data={{
+        ...data,
+        label: META.label,
+        icon: React.cloneElement(META.icon, {
+          style: { color: META.color },
+        }),
+        handles: [
+          {
+            type: "source",
+            position: Position.Right,
+          },
+        ],
       }}
-    >
-      {React.cloneElement(META.icon, {
-        style: { fontSize: 24, color: META.color },
-      })}
-      <div style={{ fontWeight: 600, marginTop: 8 }}>{META.label}</div>
-      <Handle
-        type="source"
-        position={Position.Right}
-        style={{ width: 10, height: 10, background: META.color }}
-      />
-    </Card>
+    />
   );
 };

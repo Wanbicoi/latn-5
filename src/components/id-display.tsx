@@ -7,9 +7,14 @@ import { CopyOutlined } from "@ant-design/icons";
 type IdDisplayProps = {
   id: string;
   length?: number; // Optional: how many chars to show at start/end
+  label?: string; // Optional: label to display before the ID
 };
 
-export const IdDisplay: React.FC<IdDisplayProps> = ({ id, length = 4 }) => {
+export const IdDisplay: React.FC<IdDisplayProps> = ({
+  id,
+  length = 4,
+  label,
+}) => {
   if (!id) return null;
 
   const truncated =
@@ -26,6 +31,7 @@ export const IdDisplay: React.FC<IdDisplayProps> = ({ id, length = 4 }) => {
 
   return (
     <Space>
+      {label && <span>{label}: </span>}
       <Tooltip title={id}>
         <span style={{ fontFamily: "monospace" }}>{truncated}</span>
       </Tooltip>

@@ -15,6 +15,8 @@ CREATE TYPE public_v2.stage_type AS ENUM(
     'ANNOTATE',
     'REVIEW',
     'CONSENSUS',
+    'CONSENSUS_REVIEW',
+    'CONSENSUS_ANNOTATE',
     'MITL',
     'ROUTER',
     'SUCCESS',

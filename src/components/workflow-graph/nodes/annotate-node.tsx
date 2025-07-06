@@ -1,41 +1,30 @@
-import { Card } from "antd";
-import React from "react";
-import { Handle, Position } from "reactflow";
 import { WORKFLOW_STAGE_META } from "@/utils/stage-color";
-
-type AnnotateNodeProps = {
-  selected: boolean;
-};
+import { BaseNode, BaseNodeProps } from "./base-node";
+import { Position } from "@xyflow/react";
+import React from "react";
 
 const META = WORKFLOW_STAGE_META.ANNOTATE;
-const BACKGROUND_COLOR = "#fffbe6";
 
-export const AnnotateNode: React.FC<AnnotateNodeProps> = ({ selected }) => {
+export const AnnotateNode: React.FC<Omit<BaseNodeProps, "data">> = (props) => {
   return (
-    <Card
-      size="small"
-      style={{
-        border: `2px solid ${META.color}`,
-        background: BACKGROUND_COLOR,
-        minWidth: 180,
-        textAlign: "center",
-        boxShadow: selected ? `0 0 0 2px ${META.color}` : undefined,
+    <BaseNode
+      {...props}
+      data={{
+        icon: React.cloneElement(META.icon, {
+          style: { color: META.color },
+        }),
+        label: META.label,
+        handles: [
+          {
+            type: "target",
+            position: Position.Left,
+          },
+          {
+            type: "source",
+            position: Position.Right,
+          },
+        ],
       }}
-    >
-      {React.cloneElement(META.icon, {
-        style: { fontSize: 24, color: META.color },
-      })}
-      <div style={{ fontWeight: 600, marginTop: 8 }}>{META.label}</div>
-      <Handle
-        type="target"
-        position={Position.Left}
-        style={{ width: 10, height: 10, background: META.color }}
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        style={{ width: 10, height: 10, background: META.color }}
-      />
-    </Card>
+    />
   );
 };

@@ -71,8 +71,8 @@ BEGIN
     WHERE ws.id = sub.stage_id;
 
     -- Insert placeholder assignments for each new task
-    INSERT INTO public_v2._task_assignments (task_id, stage_id, assigned_to)
-    SELECT t.id, start_stage_id, '7780000c-1a0c-4c92-9c85-3f8a9668ab00' -- is_system user
+    INSERT INTO public_v2._task_assignments (task_id, stage_id)
+    SELECT t.id, start_stage_id
     FROM public_v2._tasks t
     WHERE t.project_id = workflows_create.project_id;
 END;

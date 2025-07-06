@@ -1,21 +1,23 @@
-import React, { useCallback, useState } from "react";
-import ReactFlow, {
+import {
+  addEdge,
   Background,
+  Connection,
   Controls,
   Edge,
-  Node,
-  addEdge,
-  MiniMap,
-  Connection,
-  NodeChange,
   EdgeChange,
+  getConnectedEdges,
+  getIncomers,
+  getOutgoers,
   MarkerType,
-} from "reactflow";
-import "reactflow/dist/style.css";
-import { Button, Dropdown, Menu } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { v4 as uuidv4 } from "uuid";
-import { nodeTypes, NODE_TYPE_META } from "./nodes";
+  Node,
+  NodeChange,
+  ReactFlow,
+  ReactFlowProvider,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import React, { useCallback } from "react";
+import { nodeTypes } from "./nodes";
+import UtilsPanel from "./utils-panel";
 
 type WorkflowGraphProps = {
   editable?: boolean;
@@ -28,154 +30,118 @@ type WorkflowGraphProps = {
   workflowId?: string;
 };
 
-export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
+const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   editable = false,
   nodes,
   edges,
-  setNodes,
   setEdges,
   onEdgesChange,
   onNodesChange,
 }) => {
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
-
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    (params: Edge | Connection) =>
+      setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
+    []
   );
+  const onNodesDelete = useCallback(
+    (deleted: Node[]) => {
+      setEdges(
+        deleted.reduce((acc, node) => {
+          const incomers = getIncomers(node, nodes, edges);
+          const outgoers = getOutgoers(node, nodes, edges);
+          const connectedEdges = getConnectedEdges([node], edges);
 
-  const handleAddNode = (type: keyof typeof nodeTypes) => {
-    var data = {};
-    if (type == "ROUTER") data = { route1: 30, route2: 70 };
-    const newNode: Node = {
-      id: uuidv4(),
-      data,
-      position: { x: 100, y: 100 + nodes.length * 80 },
-      type,
-    };
-    setNodes((nds) => [...nds, newNode]);
-  };
+          const remainingEdges = acc.filter(
+            (edge: Edge) => !connectedEdges.includes(edge)
+          );
 
-  const handleNodeDataChange = useCallback(
-    (nodeId: string, newData: any) => {
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === nodeId
-            ? { ...node, data: { ...node.data, ...newData } }
-            : node
-        )
+          const createdEdges = incomers.flatMap(({ id: source }) =>
+            outgoers.map(({ id: target }) => ({
+              id: `${source}->${target}`,
+              source,
+              target,
+            }))
+          );
+
+          return [...remainingEdges, ...createdEdges];
+        }, edges)
       );
     },
-    [setNodes]
+    [nodes, edges]
   );
 
-  const handleNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
-    setSelectedNodeId(node.id);
-  }, []);
+  React.useEffect(() => {
+    // Group nodes by parentId
+    const parentGroups: Record<string, Node[]> = {};
+    nodes.forEach((node) => {
+      if (node.parentId) {
+        if (!parentGroups[node.parentId]) parentGroups[node.parentId] = [];
+        parentGroups[node.parentId].push(node);
+      }
+    });
 
-  const handleRemoveNode = () => {
-    if (!selectedNodeId) return;
-    setNodes((nds) => nds.filter((n) => n.id !== selectedNodeId));
-    setEdges((eds) =>
-      eds.filter(
-        (e) => e.source !== selectedNodeId && e.target !== selectedNodeId
-      )
-    );
-    setSelectedNodeId(null);
-  };
+    let newEdges: Edge[] = edges.filter((e) => {
+      // Remove all edges between CONSENSUS_ANNOTATE and CONSENSUS_REVIEW nodes
+      const sourceNode = nodes.find((n) => n.id === e.source);
+      const targetNode = nodes.find((n) => n.id === e.target);
+      if (!sourceNode || !targetNode) return true;
+      if (
+        sourceNode.type === "CONSENSUS_ANNOTATE" &&
+        targetNode.type === "CONSENSUS_REVIEW" &&
+        sourceNode.parentId === targetNode.parentId
+      ) {
+        return false;
+      }
+      return true;
+    });
 
-  const handleEdgeClick = useCallback((_: React.MouseEvent, edge: Edge) => {
-    setSelectedEdgeId(edge.id);
-  }, []);
+    Object.values(parentGroups).forEach((group) => {
+      const review = group.find((n) => n.type === "CONSENSUS_REVIEW");
+      if (!review) return;
+      group
+        .filter((n) => n.type === "CONSENSUS_ANNOTATE")
+        .forEach((annotate) => {
+          newEdges.push({
+            id: `${annotate.id}->${review.id}`,
+            source: annotate.id,
+            target: review.id,
+            animated: true,
+          });
+        });
+    });
 
-  const handleRemoveEdge = () => {
-    if (!selectedEdgeId) return;
-    setEdges((eds) => eds.filter((e) => e.id !== selectedEdgeId));
-    setSelectedEdgeId(null);
-  };
+    setEdges(newEdges);
+  }, [nodes]);
 
   if (nodes.length === 0 && !editable)
     return <>No stages found for this workflow.</>;
 
-  const nodesWithWorkflowId = nodes.map((node) => ({
-    ...node,
-    data: {
-      ...node.data,
-      onChange: (newData: any) => handleNodeDataChange(node.id, newData),
-    },
-  }));
-
   return (
-    <div style={{ width: "100%", height: 600, position: "relative" }}>
-      {editable && (
-        <div
-          style={{
-            position: "absolute",
-            zIndex: 10,
-            left: 8,
-            top: 8,
-            display: "flex",
-            gap: 8,
+    <div style={{ width: "100%", height: 600 }}>
+      <ReactFlowProvider>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onEdgesChange={onEdgesChange}
+          onNodesChange={onNodesChange}
+          onConnect={onConnect}
+          onNodesDelete={onNodesDelete}
+          nodeTypes={nodeTypes}
+          fitView
+          defaultEdgeOptions={{
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+            },
+            style: {
+              strokeWidth: 2,
+            },
           }}
         >
-          <Dropdown
-            menu={{
-              onClick: ({ key }) =>
-                handleAddNode(key as keyof typeof nodeTypes),
-              items: Object.keys(nodeTypes).map((key) => ({
-                key,
-                label:
-                  NODE_TYPE_META[key as keyof typeof nodeTypes]?.label || key,
-                icon:
-                  NODE_TYPE_META[key as keyof typeof nodeTypes]?.icon ||
-                  undefined,
-              })),
-            }}
-            trigger={["click"]}
-          >
-            <Button icon={<PlusOutlined />}>Add Stage</Button>
-          </Dropdown>
-          <Button
-            icon={<DeleteOutlined />}
-            danger
-            disabled={!selectedNodeId}
-            onClick={handleRemoveNode}
-          >
-            Remove Node
-          </Button>
-          <Button
-            icon={<DeleteOutlined />}
-            danger
-            disabled={!selectedEdgeId}
-            onClick={handleRemoveEdge}
-          >
-            Remove Edge
-          </Button>
-        </div>
-      )}
-      <ReactFlow
-        nodes={nodesWithWorkflowId}
-        edges={edges}
-        onEdgesChange={onEdgesChange}
-        onNodesChange={onNodesChange}
-        onConnect={onConnect}
-        onNodeClick={editable ? handleNodeClick : undefined}
-        onEdgeClick={editable ? handleEdgeClick : undefined}
-        nodeTypes={nodeTypes}
-        fitView
-        defaultEdgeOptions={{
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-          },
-          style: {
-            strokeWidth: 2,
-          },
-        }}
-      >
-        <Background />
-        <Controls />
-      </ReactFlow>
+          {editable && <UtilsPanel />}
+          <Background />
+          <Controls />
+        </ReactFlow>
+      </ReactFlowProvider>
     </div>
   );
 };
