@@ -3,13 +3,19 @@ import { Card, Tabs } from "antd";
 import { WorkflowTab } from "./workflow-tab";
 import { TasksTab } from "./tasks-tab";
 import { ResultsTab } from "./results-tab";
-import { OverviewTab } from "./overview-tab";
+import { AssigneeMetricsTab } from "./assignee-metrics-tab";
 import { SettingsTab } from "./settings-tab";
 import { useNavigate, useParams } from "react-router";
 import { Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
-const TAB_KEYS = ["workflow", "tasks", "results", "overview", "settings"];
+const TAB_KEYS = [
+  "workflow",
+  "tasks",
+  "results",
+  "assignee-metrics",
+  // "settings",
+];
 
 export function ProjectsShow() {
   const navigate = useNavigate();
@@ -63,15 +69,15 @@ export function ProjectsShow() {
             children: <ResultsTab />,
           },
           {
-            key: "overview",
-            label: "Overview",
-            children: <OverviewTab />,
+            key: "assignee-metrics",
+            label: "Assignee Metrics",
+            children: <AssigneeMetricsTab />,
           },
-          {
-            key: "settings",
-            label: "Settings",
-            children: <SettingsTab />,
-          },
+          // {
+          //   key: "settings",
+          //   label: "Settings",
+          //   children: <SettingsTab />,
+          // },
         ]}
       />
     </Card>
