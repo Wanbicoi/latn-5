@@ -38,7 +38,7 @@ type Workflow = {
   is_active: boolean;
   created_by?: string;
   created_at?: string;
-  graph_data?: { nodes: Node[]; edges: Edge[] } | null;
+  graph_data: { nodes: Node[]; edges: Edge[] };
   data_count: number;
   members_count: number;
 };
@@ -75,8 +75,8 @@ export function WorkflowTab() {
   const hasWorkflow = !!workflow?.id;
 
   // Editable workflow state
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const { mutate } = useCustomMutation({});
 
   const invalidate = useInvalidate();
