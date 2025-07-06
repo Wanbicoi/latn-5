@@ -70,6 +70,31 @@ BEGIN
     ) sub
     WHERE ws.id = sub.stage_id;
 
+    -- Set parent_stage_id for each stage based on edges
+    UPDATE public_v2._workflow_stages ws
+    SET parent_stage_id = sub.parent_stage_id
+    FROM (
+        SELECT t2.stage_id AS stage_id, t1.stage_id AS parent_stage_id
+        FROM jsonb_array_elements(edges) AS e
+        JOIN tmp_stage_ids t1 ON t1.node_id = e->>'source'
+        JOIN tmp_stage_ids t2 ON t2.node_id = e->>'target'
+    ) sub
+    WHERE ws.id = sub.stage_id;
+
+    -- Set parent_stage_id for nodes with parentId property (no edge)
+    UPDATE public_v2._workflow_stages ws
+    SET parent_stage_id = sub.parent_stage_id
+    FROM (
+        SELECT
+            t_child.stage_id AS stage_id,
+            t_parent.stage_id AS parent_stage_id
+        FROM jsonb_array_elements(nodes) AS n_child
+        JOIN tmp_stage_ids t_child ON t_child.node_id = n_child->>'id'
+        JOIN tmp_stage_ids t_parent ON t_parent.node_id = n_child->>'parentId'
+        WHERE n_child->>'parentId' IS NOT NULL AND n_child->>'parentId' <> ''
+    ) sub
+    WHERE ws.id = sub.stage_id;
+
     -- Insert placeholder assignments for each new task
     INSERT INTO public_v2._task_assignments (task_id, stage_id)
     SELECT t.id, start_stage_id

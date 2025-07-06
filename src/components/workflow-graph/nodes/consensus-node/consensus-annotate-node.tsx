@@ -27,7 +27,6 @@ export const ConsensusAnnotateNode: React.FC<NodeProps> = ({
           {
             type: "source",
             position: Position.Bottom,
-            id: "source",
           },
         ],
       }}

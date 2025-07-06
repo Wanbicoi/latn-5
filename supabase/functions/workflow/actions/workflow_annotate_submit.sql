@@ -15,10 +15,16 @@ BEGIN
     -- Update segmentation_ids array, ensuring uniqueness
     UPDATE public_v2._tasks
     SET segmentation_ids = (
-        SELECT jsonb_agg(DISTINCT elem)
+        SELECT jsonb_agg(elem)
         FROM (
             SELECT elem
-            FROM jsonb_array_elements_text(segmentation_ids || to_jsonb(segmentation_id)) AS t(elem)
+            FROM jsonb_array_elements(segmentation_ids || to_jsonb(
+                jsonb_build_object(
+                    'user_id', auth.uid(),
+                    'created_at', now(),
+                    'segmentation_id', segmentation_id
+                )
+            )) AS t(elem)
         ) sub
     )
     WHERE id = v_task_id;

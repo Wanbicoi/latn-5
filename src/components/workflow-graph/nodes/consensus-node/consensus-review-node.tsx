@@ -21,12 +21,10 @@ export const ConsensusReviewNode: React.FC<NodeProps> = (props) => {
         ),
         handles: [
           {
-            id: "top",
             type: "target",
             position: Position.Top,
           },
           {
-            id: "bottom",
             type: "source",
             position: Position.Bottom,
           },

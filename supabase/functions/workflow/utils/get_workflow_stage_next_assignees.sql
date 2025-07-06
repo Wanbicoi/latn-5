@@ -24,11 +24,8 @@ BEGIN
 
     -- Assign based on stage type
     CASE
-        WHEN v_stage_type IN ('ANNOTATE', 'REVIEW') THEN
+        WHEN v_stage_type IN ('ANNOTATE', 'REVIEW', 'CONSENSUS_ANNOTATE', 'CONSENSUS_REVIEW') THEN
             v_next_assignees := public_v2.get_next_project_assignees(v_project_id, v_stage_type);
-        WHEN v_stage_type = 'CONSENSUS' THEN
-            v_assignees_count := (v_custom_config->>'annotatorsCountRequired')::INT;
-            v_next_assignees := public_v2.get_next_project_assignees(v_project_id, 'ANNOTATE', v_assignees_count);
         ELSE
             v_next_assignees := NULL;
     END CASE;

@@ -47,7 +47,7 @@ export function ConsensusNode({
           data: {},
           position: {
             x: i * 80,
-            y: 160,
+            y: 140,
           },
           draggable: false,
           parentId: id,

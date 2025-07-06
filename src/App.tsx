@@ -43,7 +43,7 @@ function App() {
     <BrowserRouter>
       <RefineKbarProvider>
         <ConfigProvider>
-          <AntdApp>
+          <AntdApp notification={{ duration: 1 }}>
             <OhifViewerProvider>
               <Refine
                 accessControlProvider={accessControlProvider()}
