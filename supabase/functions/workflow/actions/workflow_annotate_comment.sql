@@ -3,7 +3,6 @@ DROP FUNCTION IF EXISTS public_v2.workflow_annotate_comment (UUID, TEXT, TEXT, J
 CREATE OR REPLACE FUNCTION public_v2.workflow_annotate_comment (
     task_assignment_id UUID,
     comment TEXT,
-    series_instance_uid TEXT DEFAULT NULL,
     data JSONB DEFAULT '{}'
 ) RETURNS void AS $$
 BEGIN
@@ -13,9 +12,9 @@ BEGIN
         RAISE EXCEPTION 'You do not have permission to comment on this task assignment';
     END IF;
 
-    -- Insert the comment into the _annotation_comments table with series_instance_uid
-    INSERT INTO public_v2._annotation_comments (task_assignment_id, author_id, comment, series_instance_uid, data)
-    VALUES (task_assignment_id, auth.uid(), comment, series_instance_uid, data);
+    -- Insert the comment into the _annotation_comments table 
+    INSERT INTO public_v2._annotation_comments (task_assignment_id, author_id, comment, data)
+    VALUES (task_assignment_id, auth.uid(), comment, data);
 
 
     PERFORM public_v2.notifications_workflow_create(task_assignment_id);
