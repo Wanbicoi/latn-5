@@ -59,9 +59,9 @@ BEGIN
         v_route1_threshold := COALESCE((v_custom_config->>'route1_threshold')::INT, 0);
 
         IF v_route1_current < v_route1_threshold THEN
-            PERFORM public_v2.proceed_workflow(task_assignment.id);
+            PERFORM public_v2.proceed_workflow(task_assignment.id, 'route1');
         ELSE
-            PERFORM public_v2.proceed_workflow(task_assignment.id, false);
+            PERFORM public_v2.proceed_workflow(task_assignment.id, 'route2');
             CONTINUE;
         END IF;
 

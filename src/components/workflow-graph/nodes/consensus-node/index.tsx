@@ -1,15 +1,9 @@
 import { WORKFLOW_STAGE_META } from "@/utils/stage-color";
-import {
-  Node,
-  NodeProps,
-  Position,
-  useReactFlow,
-  useUpdateNodeInternals,
-} from "@xyflow/react";
+import { Edge, Node, NodeProps, Position, useReactFlow } from "@xyflow/react";
 import { Form, InputNumber } from "antd";
 import React, { useEffect } from "react";
-import { BaseNode } from "../base-node";
 import { v4 as uuidv4 } from "uuid";
+import { BaseNode } from "../base-node";
 
 type ConsensusNode = Node<{ annotatorsCountRequired: number }>;
 const META = WORKFLOW_STAGE_META.ROUTER;
@@ -19,8 +13,15 @@ export function ConsensusNode({
   data,
   selected,
 }: NodeProps<ConsensusNode>) {
-  const { setNodes, getNodes, getNode, deleteElements, addNodes } =
-    useReactFlow();
+  const {
+    setNodes,
+    getNodes,
+    getNode,
+    deleteElements,
+    addNodes,
+    addEdges,
+    getEdges,
+  } = useReactFlow();
   const { annotatorsCountRequired } = data;
   const moveNode = (nodeId: string, newX: number, newY: number) => {
     setNodes((nodes) =>
@@ -47,7 +48,7 @@ export function ConsensusNode({
           data: {},
           position: {
             x: i * 80,
-            y: 140,
+            y: 160,
           },
           draggable: false,
           parentId: id,
@@ -84,6 +85,42 @@ export function ConsensusNode({
     addNodes(reviewNodes);
   }, [annotatorsCountRequired, id, getNode, getNodes, setNodes]);
 
+  useEffect(() => {
+    const annotateNodes = getNodes().filter(
+      (n) => n.parentId === id && n.type === "CONSENSUS_ANNOTATE"
+    );
+
+    const existingReviewNode = getNodes().find(
+      (n) => n.type === "CONSENSUS_REVIEW" && n.parentId === id
+    );
+    if (
+      annotateNodes.length === annotatorsCountRequired &&
+      existingReviewNode
+    ) {
+      const existingEdges = getEdges().filter(
+        (edge) => edge.source === id || edge.target === existingReviewNode.id
+      );
+      if (existingEdges.length > 0) {
+        deleteElements({ edges: existingEdges });
+      }
+
+      addEdges([
+        ...annotateNodes.map((node) => ({
+          id: uuidv4(),
+          source: id,
+          target: node.id,
+          animated: true,
+        })),
+        ...annotateNodes.map((node) => ({
+          id: uuidv4(),
+          source: node.id,
+          target: existingReviewNode.id,
+          animated: true,
+        })),
+      ]);
+    }
+  }, [getNodes(), annotatorsCountRequired, id]);
+
   const { updateNodeData } = useReactFlow();
 
   return (
@@ -98,6 +135,10 @@ export function ConsensusNode({
           {
             type: "target",
             position: Position.Left,
+          },
+          {
+            type: "source",
+            position: Position.Bottom,
           },
         ],
       }}

@@ -70,30 +70,43 @@ BEGIN
     ) sub
     WHERE ws.id = sub.stage_id;
 
-    -- Set parent_stage_id for each stage based on edges
-    UPDATE public_v2._workflow_stages ws
-    SET parent_stage_id = sub.parent_stage_id
-    FROM (
-        SELECT t2.stage_id AS stage_id, t1.stage_id AS parent_stage_id
-        FROM jsonb_array_elements(edges) AS e
-        JOIN tmp_stage_ids t1 ON t1.node_id = e->>'source'
-        JOIN tmp_stage_ids t2 ON t2.node_id = e->>'target'
-    ) sub
-    WHERE ws.id = sub.stage_id;
+    RAISE WARNING 'Inserting edge connection:';
+    -- Raise a warning with the edge connections being inserted
+    FOR node_obj IN
+            SELECT
+                    t1.stage_id AS source,
+                    t2.stage_id AS target,
+                    e->>'sourceHandle' AS source_handle
+            FROM jsonb_array_elements(edges) AS e
+            JOIN tmp_stage_ids t1 ON t1.node_id = e->>'source'
+            JOIN tmp_stage_ids t2 ON t2.node_id = e->>'target'
+            WHERE t1.stage_id IS NOT NULL AND t2.stage_id IS NOT NULL
+    LOOP
+            RAISE WARNING 'source=%, target=%, source_handle=%',
+                    node_obj.source, node_obj.target, node_obj.source_handle;
+    END LOOP;
 
-    -- Set parent_stage_id for nodes with parentId property (no edge)
-    UPDATE public_v2._workflow_stages ws
-    SET parent_stage_id = sub.parent_stage_id
-    FROM (
-        SELECT
-            t_child.stage_id AS stage_id,
-            t_parent.stage_id AS parent_stage_id
-        FROM jsonb_array_elements(nodes) AS n_child
-        JOIN tmp_stage_ids t_child ON t_child.node_id = n_child->>'id'
-        JOIN tmp_stage_ids t_parent ON t_parent.node_id = n_child->>'parentId'
-        WHERE n_child->>'parentId' IS NOT NULL AND n_child->>'parentId' <> ''
-    ) sub
-    WHERE ws.id = sub.stage_id;
+    -- Insert edges into _workflow_stage_connections for advanced usecases
+    INSERT INTO public_v2._workflow_stage_connections (source, target, source_handle)
+    SELECT
+        t1.stage_id AS source,
+        t2.stage_id AS target,
+        e->>'sourceHandle' AS source_handle
+    FROM jsonb_array_elements(edges) AS e
+    JOIN tmp_stage_ids t1 ON t1.node_id = e->>'source'
+    JOIN tmp_stage_ids t2 ON t2.node_id = e->>'target'
+    WHERE t1.stage_id IS NOT NULL AND t2.stage_id IS NOT NULL
+    ON CONFLICT (source, target) DO NOTHING;
+
+    -- Insert parentId-based connections into _workflow_stage_connections
+    -- INSERT INTO public_v2._workflow_stage_connections (source, target)
+    -- SELECT
+    --     t_parent.stage_id AS source,
+    --     t_child.stage_id AS target
+    -- FROM jsonb_array_elements(nodes) AS n_child
+    -- JOIN tmp_stage_ids t_child ON t_child.node_id = n_child->>'id'
+    -- JOIN tmp_stage_ids t_parent ON t_parent.node_id = n_child->>'parentId'
+    -- WHERE n_child->>'parentId' IS NOT NULL AND n_child->>'parentId' <> '';
 
     -- Insert placeholder assignments for each new task
     INSERT INTO public_v2._task_assignments (task_id, stage_id)

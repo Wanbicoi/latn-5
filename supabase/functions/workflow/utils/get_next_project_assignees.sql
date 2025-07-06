@@ -8,7 +8,7 @@ CREATE OR REPLACE FUNCTION public_v2.get_next_project_assignees (
     v_limit INT DEFAULT 1 -- maximum number of assignees to return
 ) RETURNS UUID[] AS $$
 BEGIN
-    IF v_stage_type NOT IN ('REVIEW', 'ANNOTATE') THEN
+    IF v_stage_type NOT IN ('REVIEW', 'ANNOTATE', 'CONSENSUS_ANNOTATE', 'CONSENSUS_REVIEW') THEN
         RAISE EXCEPTION 'Invalid stage type';
     END IF;
 
@@ -27,7 +27,12 @@ BEGIN
         ) ta_count ON ta_count.assigned_to = pm.user_id
         WHERE pm.project_id = v_project_id
           AND res.resource = 'workflow'
-          AND res.action = lower(v_stage_type)
+          AND res.action = 
+            CASE
+                WHEN v_stage_type = 'CONSENSUS_ANNOTATE' THEN 'annotate'
+                WHEN v_stage_type = 'CONSENSUS_REVIEW' THEN 'review'
+                ELSE lower(v_stage_type)
+            END -- 'review' or 'annotate' or consensus types mapped as above
         ORDER BY COALESCE(ta_count.assignment_count, 0) ASC
         LIMIT v_limit
     ) as sub);

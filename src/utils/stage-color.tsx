@@ -31,6 +31,16 @@ export const WORKFLOW_STAGE_META = {
     color: "#722ed1",
     icon: <TeamOutlined />,
   },
+  CONSENSUS_ANNOTATE: {
+    label: "Consensus Annotate",
+    color: "#faad14",
+    icon: <EditOutlined />,
+  },
+  CONSENSUS_REVIEW: {
+    label: "Consensus Review",
+    color: "#1890ff",
+    icon: <EyeOutlined />,
+  },
   MITL: {
     label: "MITL",
     color: "#eb2f96",

@@ -22,7 +22,8 @@ BEGIN
                 jsonb_build_object(
                     'user_id', auth.uid(),
                     'created_at', now(),
-                    'segmentation_id', segmentation_id
+                    'segmentation_id', segmentation_id,
+                    'is_approved', false 
                 )
             )) AS t(elem)
         ) sub

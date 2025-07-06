@@ -12,16 +12,7 @@ SELECT
     u.avatar_url AS user_avatar_url,
     (seg.value ->> 'created_at')::TIMESTAMPTZ AS created_at,
     seg.value ->> 'segmentation_id' AS segmentation_id,
-    (
-        (seg.value ->> 'created_at')::TIMESTAMPTZ = (
-            SELECT
-                MAX((s.value ->> 'created_at')::TIMESTAMPTZ)
-            FROM
-                JSONB_ARRAY_ELEMENTS(t.segmentation_ids) AS s (value)
-            WHERE
-                (s.value ->> 'user_id') = (seg.value ->> 'user_id')
-        )
-    ) AS is_approved
+    COALESCE((seg.value ->> 'is_approved')::BOOLEAN, false) AS is_approved
 FROM
     public_v2._task_assignments ta
     JOIN public_v2._tasks t ON ta.task_id = t.id

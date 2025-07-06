@@ -21,7 +21,7 @@ BEGIN
 
     -- Check if the user has access to resource=workflow and action=review for this project
     IF public_v2.check_workflow_permission(task_assignment_id, 'workflow', 'review') THEN
-        PERFORM public_v2.proceed_workflow(task_assignment_id, false);
+        PERFORM public_v2.proceed_workflow(task_assignment_id, 'reject');
     END IF;
 END;
 $$ LANGUAGE plpgsql;

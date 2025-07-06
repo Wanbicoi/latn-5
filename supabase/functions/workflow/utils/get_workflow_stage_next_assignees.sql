@@ -7,12 +7,10 @@ DECLARE
     v_next_assignees UUID[];
     v_project_id UUID;
     v_stage_type TEXT;
-    v_custom_config JSONB;
-    v_assignees_count INT;
 BEGIN
     -- Fetch stage type and project id for the given stage
-    SELECT ws.type, w.project_id, ws.custom_config
-    INTO v_stage_type, v_project_id, v_custom_config
+    SELECT ws.type, w.project_id
+    INTO v_stage_type, v_project_id
     FROM public_v2._workflow_stages ws
     JOIN public_v2._workflows w ON w.id = ws.workflow_id
     WHERE ws.id = stage_id

@@ -30,11 +30,15 @@ BEGIN
 
             IF COALESCE(array_length(v_next_assignees, 1), 0) = 0 THEN
                 INSERT INTO public_v2._task_assignments (task_id, stage_id, status)
-                VALUES (
-                    p_task_id,
-                    p_new_stage_id,
-                    'COMPLETED'
-                );
+                    VALUES (
+                        p_task_id,
+                        p_new_stage_id,
+                        CASE 
+                            WHEN (SELECT type FROM public_v2._workflow_stages WHERE id = p_new_stage_id) IN ('START', 'ARCHIVED') 
+                                THEN 'COMPLETED'::public_v2.assignment_status
+                            ELSE 'PENDING'::public_v2.assignment_status
+                        END
+                    );
             ELSE
                 DECLARE
                     v_next_assignee UUID;

@@ -25,6 +25,10 @@ export const ConsensusAnnotateNode: React.FC<NodeProps> = ({
         ),
         handles: [
           {
+            type: "target",
+            position: Position.Top,
+          },
+          {
             type: "source",
             position: Position.Bottom,
           },

@@ -27,7 +27,7 @@ export const RouterNode: React.FC<NodeProps<RouterNode>> = ({
           {
             type: "source" as const,
             position: Position.Right,
-            id: "approve",
+            id: "route1",
             style: { top: "30%" },
             children: (
               <div style={{ fontSize: 10, marginLeft: 12, width: 50 }}>
@@ -38,7 +38,7 @@ export const RouterNode: React.FC<NodeProps<RouterNode>> = ({
           {
             type: "source" as const,
             position: Position.Right,
-            id: "reject",
+            id: "route2",
             style: { top: "70%" },
             children: (
               <div style={{ fontSize: 10, marginLeft: 12, width: 50 }}>
