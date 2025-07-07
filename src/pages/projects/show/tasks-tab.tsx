@@ -96,14 +96,14 @@ export function TasksTab() {
           key: "actions",
           render: (_, record: any) => (
             <Space>
-              <Tooltip title="View only">
+              {/* <Tooltip title="View only">
                 <Button
                   type="primary"
                   size="small"
                   icon={<EyeOutlined />}
                   onClick={() => openViewerForTask(record)}
                 />
-              </Tooltip>
+              </Tooltip> */}
               <Popconfirm
                 title="Mark this task as in progress?"
                 onConfirm={() =>
