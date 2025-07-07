@@ -1,0 +1,5 @@
+main {
+    /* Use JS to set height dynamically based on .ant-layout-header, fallback for no JS */
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+}
