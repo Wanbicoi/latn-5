@@ -22,6 +22,7 @@ export const ProjectsList = () => {
         <Table.Column
           dataIndex="id"
           title="Id"
+          width={120}
           render={(value) => <IdDisplay id={value} />}
         />
         <Table.Column dataIndex="name" title="Name" />

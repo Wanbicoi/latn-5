@@ -1,3 +1,4 @@
+import { IdDisplay } from "@/components";
 import { UserAvatar } from "@/components/avatar";
 import { getAssignmentStatusTag } from "@/utils";
 import { getStageTag } from "@/utils/stage-color";
@@ -26,7 +27,15 @@ export function ResultsTab() {
     <Table
       {...tableProps}
       rowKey="id"
+      scroll={{ x: "max-content" }}
       columns={[
+        {
+          title: "Id",
+          dataIndex: "id",
+          key: "id",
+          width: 120,
+          render: (value) => <IdDisplay id={value} />,
+        },
         {
           title: "File",
           dataIndex: "file",
@@ -78,19 +87,20 @@ export function ResultsTab() {
           render: (value: any) => <DateField value={value} format="LLL" />,
         },
         {
-          dataIndex: "actions",
-          key: "actions",
-          render: (_: any, record: any) => (
-            <Button
-              type="primary"
-              size="small"
-              icon={<ArrowRightOutlined />}
-              iconPosition="end"
-              onClick={() => openViewerForTask(record)}
-            >
-              View results
-            </Button>
-          ),
+          dataIndex: "approved_StudyInstanceUID",
+          key: "approved_StudyInstanceUID",
+          render: (value, record: any) =>
+            value && (
+              <Button
+                type="primary"
+                size="small"
+                icon={<ArrowRightOutlined />}
+                iconPosition="end"
+                onClick={() => openViewerForTask(record)}
+              >
+                View results
+              </Button>
+            ),
         },
       ]}
       expandable={{
@@ -139,7 +149,7 @@ function openViewerForTask(record: any) {
   window.open(
     `${import.meta.env.VITE_OHIFVIEWER_ROUTE}?StudyInstanceUIDs=${
       record.file.StudyInstanceUID
-    }&taskId=${record.id}`,
+    }&StudyInstanceUIDs=${record.approved_StudyInstanceUID}`,
     "_blank"
   );
 }

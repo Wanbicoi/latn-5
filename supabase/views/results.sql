@@ -69,9 +69,20 @@ SELECT
         LIMIT
             1
     ) AS latest_status,
-    MAX(ta.created_at) AS completed_at
+    MAX(ta.created_at) AS completed_at,
+    approved.segmentation_id as "approved_StudyInstanceUID"
 FROM
     public_v2._tasks t
+    LEFT JOIN LATERAL (
+        SELECT
+            elem ->> 'segmentation_id' AS segmentation_id
+        FROM
+            JSONB_ARRAY_ELEMENTS(t.segmentation_ids) AS t_elem (elem)
+        WHERE
+            (elem ->> 'is_approved')::BOOLEAN = true
+        LIMIT
+            1
+    ) approved ON TRUE
     JOIN public_v2._task_assignments ta ON ta.task_id = t.id
     JOIN public_v2._workflow_stages ws ON ta.stage_id = ws.id
     LEFT JOIN public_v2._users u ON ta.assigned_to = u.id
@@ -79,4 +90,5 @@ FROM
 GROUP BY
     t.id,
     di.orthanc_uuid,
-    di.data
+    di.data,
+    approved.segmentation_id

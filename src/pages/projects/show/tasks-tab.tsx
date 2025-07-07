@@ -29,11 +29,13 @@ export function TasksTab() {
     <Table
       {...tableProps}
       rowKey="id"
+      scroll={{ x: "max-content" }}
       columns={[
         {
           title: "Id",
           dataIndex: "id",
           key: "id",
+          width: 120,
           render: (value) => <IdDisplay id={value} />,
         },
         {
