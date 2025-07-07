@@ -34,7 +34,7 @@ BEGIN
                         p_task_id,
                         p_new_stage_id,
                         CASE 
-                            WHEN (SELECT type FROM public_v2._workflow_stages WHERE id = p_new_stage_id) IN ('START', 'ARCHIVED') 
+                            WHEN (SELECT type FROM public_v2._workflow_stages WHERE id = p_new_stage_id) IN ('START', 'ARCHIVED', 'SUCCESS') 
                                 THEN 'COMPLETED'::public_v2.assignment_status
                             ELSE 'PENDING'::public_v2.assignment_status
                         END

@@ -30,6 +30,12 @@ $$ LANGUAGE plpgsql;
 select
     tests.create_supabase_user ('admin@test.com');
 
+select
+    tests.create_supabase_user ('reviewer@test.com');
+
+select
+    tests.create_supabase_user ('annotator@test.com');
+
 -- Authenticate as test user
 select
     tests.authenticate_as ('admin@test.com');
@@ -51,7 +57,7 @@ select
 create temp table test_project as
 select
     public_v2.projects_create (
-        'New Project',
+        'New Project123123123123',
         'A description for the new project',
         ARRAY[
             (
@@ -63,11 +69,52 @@ select
         ]::bigint[]
     ) as id;
 
+-- Add a member to the project as admin
+select
+    public_v2.project_members_update (
+        (
+            select
+                id
+            from
+                test_project
+            limit
+                1
+        ),
+        JSONB_BUILD_ARRAY(
+            JSONB_BUILD_OBJECT(
+                'id',
+                tests.get_supabase_uid ('admin@test.com'),
+                'role_id',
+                'a6be23ff-1aca-4f92-8414-aefbad438d20' -- Admin role
+            ),
+            JSONB_BUILD_OBJECT(
+                'id',
+                tests.get_supabase_uid ('reviewer@test.com'),
+                'role_id',
+                '849dfd16-2840-4dfd-9115-762db9ff5253' -- Reviewer role
+            ),
+            JSONB_BUILD_OBJECT(
+                'id',
+                tests.get_supabase_uid ('annotator@test.com'),
+                'role_id',
+                '2d0ac3ac-abd8-4611-bd86-c90ec4d7271c' -- Annotator role
+            )
+        )
+    );
+
+-- Test: project_members view should have one member for the project
+select
+    results_eq (
+        $$select JSONB_ARRAY_LENGTH(members)::BIGINT from public_v2.project_members where id = ( select id from test_project )$$,
+        $$SELECT 3::BIGINT$$,
+        '3 members should be added to the project'
+    );
+
 -- Test: projects view returns the created project with correct name and description
 select
     results_eq (
         $$select name::varchar, description::text from public_v2.projects where id = (select id from test_project)$$,
-        $$VALUES ('New Project'::varchar, 'A description for the new project'::text)$$,
+        $$VALUES ('New Project123123123123'::varchar, 'A description for the new project'::text)$$,
         'projects view returns updated project'
     );
 
@@ -112,35 +159,6 @@ select
         'projects view returns updated project'
     );
 
--- Add a member to the project as admin
-select
-    public_v2.project_members_update (
-        (
-            select
-                id
-            from
-                test_project
-            limit
-                1
-        ),
-        JSONB_BUILD_ARRAY(
-            JSONB_BUILD_OBJECT(
-                'id',
-                tests.get_supabase_uid ('admin@test.com'),
-                'role_id',
-                'a6be23ff-1aca-4f92-8414-aefbad438d20' -- Admin role
-            )
-        )
-    );
-
--- Test: project_members view should have one member for the project
-select
-    results_eq (
-        $$select COUNT(*)::BIGINT from public_v2.project_members where id = ( select id from test_project )$$,
-        $$SELECT 1::BIGINT$$,
-        'A member should be added to the project'
-    );
-
 -- Update dataset for the project using datasets_update
 select
     lives_ok (
@@ -162,8 +180,8 @@ select
             select 
                 public_v2.workflows_create ( 
                     ( select id from test_project ),
-                    '[ { "id": "6462df51-ec8e-4728-97eb-16f4ab2c8654", "data": {}, "type": "START", "dragging": false, "measured": { "width": 82, "height": 63 }, "position": { "x": 371.5, "y": -28 }, "selected": false, "dragHandle": ".ant-card-head" }, { "id": "28c0e488-147f-4759-8c8d-1150c93c93ce", "data": {}, "type": "ANNOTATE", "dragging": false, "measured": { "width": 110, "height": 63 }, "position": { "x": 546, "y": 51 }, "selected": false, "dragHandle": ".ant-card-head" }, { "id": "8bd0275e-f977-45d6-8a6a-2ed05dcf61af", "data": {}, "type": "SUCCESS", "dragging": false, "measured": { "width": 105, "height": 63 }, "position": { "x": 798, "y": -42.5 }, "selected": false, "dragHandle": ".ant-card-head" }, { "id": "caa618d5-3921-4554-9021-663968c9bc6c", "data": {}, "type": "REVIEW", "dragging": false, "measured": { "width": 96, "height": 63 }, "position": { "x": 550.5, "y": -96.5625 }, "selected": false, "dragHandle": ".ant-card-head" } ]'::JSONB,
-                    '[ { "id": "xy-edge__6462df51-ec8e-4728-97eb-16f4ab2c8654-28c0e488-147f-4759-8c8d-1150c93c93ce", "style": { "strokeWidth": 2 }, "source": "6462df51-ec8e-4728-97eb-16f4ab2c8654", "target": "28c0e488-147f-4759-8c8d-1150c93c93ce", "animated": true, "markerEnd": { "type": "arrowclosed" } }, { "id": "xy-edge__28c0e488-147f-4759-8c8d-1150c93c93ce-caa618d5-3921-4554-9021-663968c9bc6c", "style": { "strokeWidth": 2 }, "source": "28c0e488-147f-4759-8c8d-1150c93c93ce", "target": "caa618d5-3921-4554-9021-663968c9bc6c", "animated": true, "markerEnd": { "type": "arrowclosed" } }, { "id": "xy-edge__caa618d5-3921-4554-9021-663968c9bc6creject-28c0e488-147f-4759-8c8d-1150c93c93ce", "style": { "strokeWidth": 2 }, "source": "caa618d5-3921-4554-9021-663968c9bc6c", "target": "28c0e488-147f-4759-8c8d-1150c93c93ce", "animated": true, "markerEnd": { "type": "arrowclosed" }, "sourceHandle": "reject" }, { "id": "xy-edge__caa618d5-3921-4554-9021-663968c9bc6capprove-8bd0275e-f977-45d6-8a6a-2ed05dcf61af", "style": { "strokeWidth": 2 }, "source": "caa618d5-3921-4554-9021-663968c9bc6c", "target": "8bd0275e-f977-45d6-8a6a-2ed05dcf61af", "animated": true, "markerEnd": { "type": "arrowclosed" }, "sourceHandle": "approve" } ]'::JSONB
+                    '[ { "id": "16d0b30a-fd0d-4b2c-a1e6-553775c9e56d", "data": {}, "type": "START", "dragging": false, "measured": { "width": 84, "height": 65 }, "position": { "x": 404.66181274095686, "y": -103.773457182454 }, "selected": true, "dragHandle": ".ant-card-head" }, { "id": "a1f53a4c-47bc-4652-870c-07a930405245", "data": {}, "type": "ANNOTATE", "dragging": false, "measured": { "width": 110, "height": 63 }, "position": { "x": 545, "y": -36.5 }, "selected": false, "dragHandle": ".ant-card-head" }, { "id": "035bfca1-9675-4908-9079-875a241ace82", "data": {}, "type": "REVIEW", "dragging": false, "measured": { "width": 96, "height": 63 }, "position": { "x": 554, "y": -192.9375 }, "selected": false, "dragHandle": ".ant-card-head" }, { "id": "ed79f5a4-dbca-44eb-af48-d0d64cc95dac", "data": {}, "type": "SUCCESS", "dragging": false, "measured": { "width": 105, "height": 63 }, "position": { "x": 776, "y": -107 }, "selected": false, "dragHandle": ".ant-card-head" } ]'::JSONB,
+                    '[ { "id": "xy-edge__16d0b30a-fd0d-4b2c-a1e6-553775c9e56d-a1f53a4c-47bc-4652-870c-07a930405245", "style": { "strokeWidth": 2 }, "source": "16d0b30a-fd0d-4b2c-a1e6-553775c9e56d", "target": "a1f53a4c-47bc-4652-870c-07a930405245", "animated": true, "markerEnd": { "type": "arrowclosed" } }, { "id": "xy-edge__a1f53a4c-47bc-4652-870c-07a930405245-035bfca1-9675-4908-9079-875a241ace82", "style": { "strokeWidth": 2 }, "source": "a1f53a4c-47bc-4652-870c-07a930405245", "target": "035bfca1-9675-4908-9079-875a241ace82", "animated": true, "markerEnd": { "type": "arrowclosed" } }, { "id": "xy-edge__035bfca1-9675-4908-9079-875a241ace82reject-a1f53a4c-47bc-4652-870c-07a930405245", "style": { "strokeWidth": 2 }, "source": "035bfca1-9675-4908-9079-875a241ace82", "target": "a1f53a4c-47bc-4652-870c-07a930405245", "animated": true, "markerEnd": { "type": "arrowclosed" }, "sourceHandle": "reject" }, { "id": "xy-edge__035bfca1-9675-4908-9079-875a241ace82approve-ed79f5a4-dbca-44eb-af48-d0d64cc95dac", "style": { "strokeWidth": 2 }, "source": "035bfca1-9675-4908-9079-875a241ace82", "target": "ed79f5a4-dbca-44eb-af48-d0d64cc95dac", "animated": true, "markerEnd": { "type": "arrowclosed" }, "sourceHandle": "approve" } ]'::JSONB
                 )
         $$,
         'workflows_create successfully creates a workflow'
@@ -244,6 +262,9 @@ select
         'test_assignment should not be null'
     );
 
+select
+    tests.authenticate_as ('annotator@test.com');
+
 -- Start the task assignment using tasks_start
 select
     lives_ok (
@@ -262,6 +283,9 @@ select
         $$VALUES ('IN_PROGRESS'::public_v2.assignment_status)$$,
         'tasks_start sets task assignment to IN_PROGRESS'
     );
+
+select
+    tests.authenticate_as ('annotator@test.com');
 
 -- The following tests for submit, comment, and approve are commented out for now
 -- -- Submit the annotation for the task assignment
@@ -289,7 +313,7 @@ select
             )
         $$,
         $$VALUES ('COMPLETED'::public_v2.assignment_status), ('COMPLETED'::public_v2.assignment_status), ('PENDING'::public_v2.assignment_status)$$,
-        'workflow_annotate_submit check all task assignments for the task are COMPLETED except the one that is still PENDING'
+        'First workflow_annotate_submit'
     );
 
 update test_assignment
@@ -302,6 +326,9 @@ set
                 test_assignment
         )
     );
+
+select
+    tests.authenticate_as ('reviewer@test.com');
 
 -- Add a comment to the annotation
 select
@@ -338,6 +365,9 @@ set
     );
 
 select
+    tests.authenticate_as ('annotator@test.com');
+
+select
     lives_ok (
         $$
             select 
@@ -360,12 +390,15 @@ set
         )
     );
 
+select
+    tests.authenticate_as ('reviewer@test.com');
+
 -- Approve the annotation
 select
     lives_ok (
         $$
             select public_v2.workflow_annotate_approve(
-                (select id from test_assignment)
+                (select id from test_assignment), 'uuid'
             )
         $$,
         'workflow_annotate_approve successfully approves the annotation'
