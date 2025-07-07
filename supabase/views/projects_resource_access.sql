@@ -1,9 +1,10 @@
-DROP VIEW IF EXISTS public_v2.resource_access;
+DROP VIEW IF EXISTS public_v2.projects_resource_access;
 
-CREATE OR REPLACE VIEW public_v2.resource_access
+CREATE OR REPLACE VIEW public_v2.projects_resource_access
 WITH
     (security_invoker = true) AS
-SELECT distinct
+SELECT
+    pm.project_id,
     r.resource,
     r.action
 FROM

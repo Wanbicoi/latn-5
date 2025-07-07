@@ -1,11 +1,13 @@
-import { List } from "@refinedev/antd";
+import { List, useTable } from "@refinedev/antd";
 import { Button, Table, Tag } from "antd";
-import { useTable } from "@refinedev/antd";
 
-import { useMemo } from "react";
 import { CheckCircleTwoTone, CloseCircleOutlined } from "@ant-design/icons";
 import { useCustomMutation, useInvalidate } from "@refinedev/core";
+import { useMemo } from "react";
 
+const capitalize = (str: string): string => {
+  return str.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+};
 export const PermissionsList = () => {
   const {
     tableProps,
@@ -64,6 +66,7 @@ export const PermissionsList = () => {
   // Calculate rowSpan for resource grouping
   const groupedData = dataSource
     .map((item: any) => ({
+      description: item.description,
       resource: item.resource,
       action: item.action,
     }))
@@ -105,61 +108,73 @@ export const PermissionsList = () => {
       title: "Resource",
       dataIndex: "resource",
       width: 120,
+      align: "center" as const,
       onCell: (record: any) => ({
         rowSpan: record.resourceRowSpan,
       }),
-      render: (value: string) => value,
+      render: (value: string) => capitalize(value),
       fixed: "left" as const,
     },
     {
       title: "Action",
       dataIndex: "action",
-      width: 150,
       fixed: "left" as const,
-      render: (value: string) => <Tag color="geekblue">{value}</Tag>,
+      align: "center" as const,
+      width: 120,
+      render: (value: string, record: any) => (
+        <Tag color="geekblue">{capitalize(value)}</Tag>
+      ),
     },
-    ...roleIds.map((roleId: string) => {
-      const roleName = roleIdNameMap[roleId] || roleId;
-      return {
-        title: roleName,
-        dataIndex: String(roleId),
-        align: "center" as const,
-        render: (value: boolean, record: any) => (
-          <Button
-            style={{ cursor: "pointer" }}
-            onClick={async () =>
-              mutate(
-                {
-                  url: "permissions_toggle",
-                  method: "post",
-                  values: {
-                    role_id: roleId,
-                    resource: record.resource,
-                    action: record.action,
+    {
+      title: "Description",
+      dataIndex: "description",
+      fixed: "left" as const,
+      render: (value: string) => value,
+    },
+    ...roleIds
+      .map((roleId: string) => {
+        const roleName = roleIdNameMap[roleId] || roleId;
+        return {
+          title: roleName,
+          dataIndex: String(roleId),
+          align: "center" as const,
+          render: (value: boolean, record: any) => (
+            <Button
+              style={{ cursor: "pointer" }}
+              onClick={async () =>
+                mutate(
+                  {
+                    url: "permissions_toggle",
+                    method: "post",
+                    values: {
+                      role_id: roleId,
+                      resource: record.resource,
+                      action: record.action,
+                    },
                   },
-                },
-                {
-                  onSuccess: () =>
-                    invalidate({
-                      resource: "permissions",
-                      invalidates: ["resourceAll"],
-                    }),
-                }
-              )
-            }
-            type="text"
-            shape="circle"
-            icon={
-              value ? (
-                <CheckCircleTwoTone twoToneColor="#52c41a" />
-              ) : (
-                <CloseCircleOutlined />
-              )
-            }
-          />
-        ),
-      };
-    }),
+                  {
+                    onSuccess: () =>
+                      invalidate({
+                        resource: "permissions",
+                        invalidates: ["resourceAll"],
+                      }),
+                  }
+                )
+              }
+              type="text"
+              shape="circle"
+              icon={
+                value ? (
+                  <CheckCircleTwoTone twoToneColor="#52c41a" />
+                ) : (
+                  <CloseCircleOutlined />
+                )
+              }
+            />
+          ),
+        };
+      })
+      .sort((a, b) => a.title.localeCompare(b.title)),
   ];
 
   return (

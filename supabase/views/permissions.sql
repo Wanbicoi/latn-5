@@ -5,6 +5,7 @@ WITH
     (security_invoker = true) AS
 SELECT
     r.resource,
+    r.description,
     r.action,
     rl.id AS role_id,
     rl.name AS role_name

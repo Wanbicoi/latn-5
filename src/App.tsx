@@ -10,6 +10,12 @@ import {
 } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
 
+import {
+  LockOutlined,
+  ProjectOutlined,
+  TagsOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
 import routerBindings, {
   CatchAllNavigate,
   NavigateToResource,
@@ -17,26 +23,19 @@ import routerBindings, {
 import { liveProvider } from "@refinedev/supabase";
 import { App as AntdApp, ConfigProvider } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
-import { OhifViewer } from "./components/ohif-viewer";
-import authProvider from "./providers/auth-provider";
 import { Header } from "./components/header";
+import { OhifViewer } from "./components/ohif-viewer";
 import Title from "./components/title";
-import { ProjectsCreate, ProjectsList, ProjectsShow } from "./pages/projects";
-import { MembersList } from "./pages/members";
-import { TagsList } from "./pages/tags";
-import PermissionsList from "./pages/permissions/list";
-import { supabaseClient } from "./utils";
-import { accessControlProvider } from "./providers/access-control";
-import { ohifTheme } from "./ohif-theme";
-import Homepage from "./pages/home";
 import { OhifViewerProvider } from "./contexts/ohif-viewer";
-import {
-  LockOutlined,
-  ProjectOutlined,
-  TagsOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
+import Homepage from "./pages/home";
+import { MembersList } from "./pages/members";
+import PermissionsList from "./pages/permissions/list";
+import { ProjectsCreate, ProjectsList, ProjectsShow } from "./pages/projects";
+import { TagsList } from "./pages/tags";
+import { accessControlProvider } from "./providers/access-control";
+import authProvider from "./providers/auth-provider";
 import { dataProvider } from "./providers/supabase";
+import { supabaseClient } from "./utils";
 
 function App() {
   return (
