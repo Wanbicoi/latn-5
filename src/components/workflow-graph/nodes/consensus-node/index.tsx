@@ -1,5 +1,5 @@
 import { WORKFLOW_STAGE_META } from "@/utils/stage-color";
-import { Edge, Node, NodeProps, Position, useReactFlow } from "@xyflow/react";
+import { Node, NodeProps, Position, useReactFlow } from "@xyflow/react";
 import { Form, InputNumber } from "antd";
 import React, { useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -47,7 +47,7 @@ export function ConsensusNode({
           type: "CONSENSUS_ANNOTATE",
           data: {},
           position: {
-            x: i * 80,
+            x: i * 100,
             y: 160,
           },
           draggable: false,
@@ -57,6 +57,33 @@ export function ConsensusNode({
     );
     addNodes(newAnnotateNodes);
 
+    // Add Consensus Holding Node
+    const existingHoldingNode = getNodes().find(
+      (n) => n.type === "CONSENSUS_HOLDING" && n.parentId === id
+    );
+    let holdingNodeId = existingHoldingNode?.id;
+    if (existingHoldingNode) {
+      moveNode(
+        existingHoldingNode.id,
+        ((annotatorsCountRequired - 1) * 100) / 2,
+        260
+      );
+    } else {
+      const holdingNode = {
+        id: uuidv4(),
+        type: "CONSENSUS_HOLDING",
+        data: {},
+        position: {
+          x: ((annotatorsCountRequired - 1) * 100) / 2,
+          y: 260,
+        },
+        draggable: false,
+        parentId: id,
+      };
+      holdingNodeId = holdingNode.id;
+      addNodes([holdingNode]);
+    }
+
     const existingReviewNode = getNodes().find(
       (n) => n.type === "CONSENSUS_REVIEW" && n.parentId === id
     );
@@ -64,8 +91,8 @@ export function ConsensusNode({
     if (existingReviewNode) {
       moveNode(
         existingReviewNode.id,
-        ((annotatorsCountRequired - 1) * 80) / 2,
-        260
+        ((annotatorsCountRequired - 1) * 100) / 2,
+        320
       );
       return;
     }
@@ -75,8 +102,8 @@ export function ConsensusNode({
         type: "CONSENSUS_REVIEW",
         data: {},
         position: {
-          x: ((annotatorsCountRequired - 1) * 80) / 2,
-          y: 260,
+          x: ((annotatorsCountRequired - 1) * 100) / 2,
+          y: 320,
         },
         draggable: false,
         parentId: id,
@@ -90,15 +117,24 @@ export function ConsensusNode({
       (n) => n.parentId === id && n.type === "CONSENSUS_ANNOTATE"
     );
 
+    const holdingNode = getNodes().find(
+      (n) => n.type === "CONSENSUS_HOLDING" && n.parentId === id
+    );
+
     const existingReviewNode = getNodes().find(
       (n) => n.type === "CONSENSUS_REVIEW" && n.parentId === id
     );
     if (
       annotateNodes.length === annotatorsCountRequired &&
+      holdingNode &&
       existingReviewNode
     ) {
       const existingEdges = getEdges().filter(
-        (edge) => edge.source === id || edge.target === existingReviewNode.id
+        (edge) =>
+          edge.source === id ||
+          edge.target === existingReviewNode.id ||
+          edge.target === holdingNode.id ||
+          edge.source === holdingNode.id
       );
       if (existingEdges.length > 0) {
         deleteElements({ edges: existingEdges });
@@ -114,12 +150,18 @@ export function ConsensusNode({
         ...annotateNodes.map((node) => ({
           id: uuidv4(),
           source: node.id,
-          target: existingReviewNode.id,
+          target: holdingNode.id,
           animated: true,
         })),
+        {
+          id: uuidv4(),
+          source: holdingNode.id,
+          target: existingReviewNode.id,
+          animated: true,
+        },
       ]);
     }
-  }, [getNodes(), annotatorsCountRequired, id]);
+  }, [getNodes().length, annotatorsCountRequired, id]);
 
   const { updateNodeData } = useReactFlow();
 
@@ -151,7 +193,7 @@ export function ConsensusNode({
         <InputNumber
           size="small"
           min={2}
-          max={6}
+          max={5}
           value={data.annotatorsCountRequired}
           onChange={(value) =>
             updateNodeData(id, { annotatorsCountRequired: value })

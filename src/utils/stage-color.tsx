@@ -2,6 +2,7 @@ import {
   ApiOutlined,
   BranchesOutlined,
   CheckCircleOutlined,
+  ClockCircleOutlined,
   EditOutlined,
   EyeOutlined,
   InboxOutlined,
@@ -40,6 +41,11 @@ export const WORKFLOW_STAGE_META = {
     label: "Consensus Review",
     color: "#1890ff",
     icon: <EyeOutlined />,
+  },
+  CONSENSUS_HOLDING: {
+    label: "Consensus Holding",
+    color: "#1890ff",
+    icon: <ClockCircleOutlined />,
   },
   MITL: {
     label: "MITL",

@@ -17,7 +17,7 @@ function getDefaultNodeData(type: string) {
   }
 }
 const UtilsPanel = () => {
-  const { getNodes, deleteElements, addNodes } = useReactFlow();
+  const { deleteElements, addNodes } = useReactFlow();
   const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
   const [selectedEdges, setSelectedEdges] = useState<Edge[]>([]);
 
@@ -51,7 +51,11 @@ const UtilsPanel = () => {
             items: Object.keys(nodeTypes)
               .filter(
                 (key) =>
-                  key !== "CONSENSUS_ANNOTATE" && key !== "CONSENSUS_REVIEW"
+                  [
+                    "CONSENSUS_ANNOTATE",
+                    "CONSENSUS_REVIEW",
+                    "CONSENSUS_HOLDING",
+                  ].indexOf(key) === -1
               )
               .map((key) => ({
                 key,

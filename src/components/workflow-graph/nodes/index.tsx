@@ -2,6 +2,7 @@ import { AnnotateNode } from "./annotate-node";
 import { ReviewNode } from "./review-node";
 import { ConsensusNode } from "./consensus-node";
 import { ConsensusAnnotateNode } from "./consensus-node/consensus-annotate-node";
+import { ConsensusHoldingNode } from "./consensus-node/consensus-hoding-node";
 import { ConsensusReviewNode } from "./consensus-node/consensus-review-node";
 import { MitlNode } from "./mitl-node";
 import { RouterNode } from "./router-node";
@@ -16,6 +17,7 @@ export const nodeTypes = {
   ANNOTATE: AnnotateNode,
   REVIEW: ReviewNode,
   CONSENSUS: ConsensusNode,
+  CONSENSUS_HOLDING: ConsensusHoldingNode,
   CONSENSUS_ANNOTATE: ConsensusAnnotateNode,
   CONSENSUS_REVIEW: ConsensusReviewNode,
   MITL: MitlNode,
