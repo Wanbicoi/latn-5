@@ -213,7 +213,9 @@ function ChooseDataForAnnotate({ formProps, dataModalProps, viewOnly }: any) {
       okText="Done"
       cancelText="Cancel"
       destroyOnHidden
-      okButtonProps={viewOnly ? { disabled: true } : undefined}
+      okButtonProps={
+        viewOnly ? { disabled: true } : dataModalProps.okButtonProps
+      }
     >
       <Form {...formProps} layout="vertical">
         <Form.Item
@@ -267,7 +269,9 @@ function ChooseProjectMember({ formProps, memberModalProps, viewOnly }: any) {
       okText="Done"
       cancelText="Cancel"
       destroyOnHidden
-      okButtonProps={viewOnly ? { disabled: true } : undefined}
+      okButtonProps={
+        viewOnly ? { disabled: true } : memberModalProps.okButtonProps
+      }
     >
       <Form {...formProps} layout="vertical">
         <Form.List name="members">

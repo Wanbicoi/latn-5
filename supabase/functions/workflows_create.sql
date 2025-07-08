@@ -5,6 +5,20 @@ DECLARE
     start_stage_id UUID;
     p_workflow_id UUID;
 BEGIN
+    -- Check for at least one assignee using the project_members view
+    IF NOT EXISTS (
+        SELECT 1 FROM public_v2.project_members WHERE id = workflows_create.project_id AND jsonb_array_length(members) > 0
+    ) THEN
+        RAISE EXCEPTION 'Project must have at least one assignee';
+    END IF;
+
+    -- Check for at least one dataset using the datasets view
+    IF NOT EXISTS (
+        SELECT 1 FROM public_v2.datasets WHERE id = workflows_create.project_id AND array_length(resources, 1) > 0
+    ) THEN
+        RAISE EXCEPTION 'Project must have at least one dataset';
+    END IF;
+
     INSERT INTO public_v2._workflows (project_id, graph_data)
     VALUES (workflows_create.project_id, jsonb_build_object('nodes', nodes, 'edges', edges))
     RETURNING id INTO p_workflow_id;
