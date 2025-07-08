@@ -153,7 +153,7 @@ export function WorkflowTab() {
                   />
                 }
               >
-                Choose project members
+                View project members
               </Button>
               <Button
                 onClick={() => showDatasetsModal(project_id)}
