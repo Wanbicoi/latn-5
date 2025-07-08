@@ -4,7 +4,7 @@ import { getAssignmentStatusTag } from "@/utils";
 import { getStageTag } from "@/utils/stage-color";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { DateField, useTable } from "@refinedev/antd";
-import { useParsed } from "@refinedev/core";
+import { useInvalidate, useParsed, useSubscription } from "@refinedev/core";
 import { Button, Descriptions, List, Table, Typography } from "antd";
 
 export function ResultsTab() {
@@ -22,7 +22,16 @@ export function ResultsTab() {
     },
     syncWithLocation: false,
   });
-
+  const invalidate = useInvalidate();
+  useSubscription({
+    channel: "resources/_tasks",
+    onLiveEvent: () =>
+      invalidate({
+        resource: "results",
+        invalidates: ["resourceAll"],
+      }),
+    types: ["*"],
+  });
   return (
     <Table
       {...tableProps}

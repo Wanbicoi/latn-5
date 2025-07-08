@@ -3,7 +3,12 @@ import { getAssignmentStatusTag } from "@/utils";
 import { getStageTag } from "@/utils/stage-color";
 import { ArrowRightOutlined, EyeOutlined } from "@ant-design/icons";
 import { DateField, useTable } from "@refinedev/antd";
-import { useCustomMutation, useInvalidate, useParsed } from "@refinedev/core";
+import {
+  useCustomMutation,
+  useInvalidate,
+  useParsed,
+  useSubscription,
+} from "@refinedev/core";
 import { Button, Descriptions, Popconfirm, Space, Table, Tooltip } from "antd";
 
 export function TasksTab() {
@@ -24,7 +29,15 @@ export function TasksTab() {
   });
   const { mutate } = useCustomMutation();
   const invalidate = useInvalidate();
-
+  useSubscription({
+    channel: "resources/_task_assignments",
+    onLiveEvent: () =>
+      invalidate({
+        resource: "tasks",
+        invalidates: ["resourceAll"],
+      }),
+    types: ["*"],
+  });
   return (
     <Table
       {...tableProps}
