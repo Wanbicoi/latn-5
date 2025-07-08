@@ -193,6 +193,7 @@ export function WorkflowTab() {
         <ChooseProjectMember
           formProps={memberFormProps}
           memberModalProps={memberModalProps}
+          viewOnly={hasWorkflow}
         />
       </Space>
     </Spin>
@@ -250,7 +251,7 @@ function ChooseDataForAnnotate({ formProps, dataModalProps, viewOnly }: any) {
     </Modal>
   );
 }
-function ChooseProjectMember({ formProps, memberModalProps }: any) {
+function ChooseProjectMember({ formProps, memberModalProps, viewOnly }: any) {
   const { data: membersData } = useList({ resource: "members" });
   const { data: rolesData } = useList({ resource: "roles" });
 
@@ -258,10 +259,15 @@ function ChooseProjectMember({ formProps, memberModalProps }: any) {
     <Modal
       {...memberModalProps}
       width={500}
-      title="Select project members and roles"
+      title={
+        viewOnly
+          ? "Project members and roles"
+          : "Select project members and roles"
+      }
       okText="Done"
       cancelText="Cancel"
       destroyOnHidden
+      okButtonProps={viewOnly ? { disabled: true } : undefined}
     >
       <Form {...formProps} layout="vertical">
         <Form.List name="members">
@@ -278,6 +284,7 @@ function ChooseProjectMember({ formProps, memberModalProps }: any) {
                     <Select
                       placeholder="Member"
                       style={{ width: 180 }}
+                      disabled={viewOnly}
                       options={
                         membersData?.data
                           ?.filter((m: any) => {
@@ -306,6 +313,7 @@ function ChooseProjectMember({ formProps, memberModalProps }: any) {
                     <Select
                       placeholder="Role"
                       style={{ width: 140 }}
+                      disabled={viewOnly}
                       options={
                         rolesData?.data?.map((r: any) => ({
                           label: r.name,
@@ -314,18 +322,22 @@ function ChooseProjectMember({ formProps, memberModalProps }: any) {
                       }
                     />
                   </Form.Item>
-                  <Button
-                    size="small"
-                    danger
-                    shape="circle"
-                    onClick={() => remove(name)}
-                    icon={<DeleteOutlined />}
-                  />
+                  {!viewOnly && (
+                    <Button
+                      size="small"
+                      danger
+                      shape="circle"
+                      onClick={() => remove(name)}
+                      icon={<DeleteOutlined />}
+                    />
+                  )}
                 </Space>
               ))}
-              <Button type="dashed" onClick={() => add()} block>
-                Add Member
-              </Button>
+              {!viewOnly && (
+                <Button type="dashed" onClick={() => add()} block>
+                  Add Member
+                </Button>
+              )}
             </Space>
           )}
         </Form.List>
