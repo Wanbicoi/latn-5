@@ -4,8 +4,6 @@ import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import {
   AuthPage,
   ErrorComponent,
-  ThemedLayoutV2,
-  ThemedSiderV2,
   useNotificationProvider,
 } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
@@ -36,6 +34,8 @@ import { accessControlProvider } from "./providers/access-control";
 import authProvider from "./providers/auth-provider";
 import { dataProvider } from "./providers/supabase";
 import { supabaseClient } from "./utils";
+import { ThemedLayoutV2 } from "./components/layout";
+import { ThemedSiderV2 } from "./components/layout/sider";
 
 function App() {
   return (

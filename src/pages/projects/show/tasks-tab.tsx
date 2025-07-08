@@ -96,44 +96,47 @@ export function TasksTab() {
           key: "actions",
           render: (_, record: any) => (
             <Space>
-              {/* <Tooltip title="View only">
+              {record.is_assigned ? (
+                <Popconfirm
+                  title="Mark this task as in progress?"
+                  onConfirm={() =>
+                    mutate(
+                      {
+                        url: "tasks_start",
+                        method: "post",
+                        values: { task_assignment_id: record.id },
+                      },
+                      {
+                        onSuccess: () => {
+                          invalidate({
+                            resource: "tasks",
+                            invalidates: ["list"],
+                          });
+                          openViewerForTask(record);
+                        },
+                      }
+                    )
+                  }
+                >
+                  <Button
+                    type="primary"
+                    iconPosition="end"
+                    icon={<ArrowRightOutlined />}
+                    size="small"
+                  >
+                    Start
+                  </Button>
+                </Popconfirm>
+              ) : (
                 <Button
                   type="primary"
                   size="small"
                   icon={<EyeOutlined />}
                   onClick={() => openViewerForTask(record)}
-                />
-              </Tooltip> */}
-              <Popconfirm
-                title="Mark this task as in progress?"
-                onConfirm={() =>
-                  mutate(
-                    {
-                      url: "tasks_start",
-                      method: "post",
-                      values: { task_assignment_id: record.id },
-                    },
-                    {
-                      onSuccess: () => {
-                        invalidate({
-                          resource: "tasks",
-                          invalidates: ["list"],
-                        });
-                        openViewerForTask(record);
-                      },
-                    }
-                  )
-                }
-              >
-                <Button
-                  type="primary"
-                  iconPosition="end"
-                  icon={<ArrowRightOutlined />}
-                  size="small"
                 >
-                  Start
+                  View
                 </Button>
-              </Popconfirm>
+              )}
             </Space>
           ),
         },

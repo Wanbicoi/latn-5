@@ -25,6 +25,10 @@ SELECT
     ) AS file,
     ta.status,
     u.full_name AS assigned_to,
+    CASE
+        WHEN ta.assigned_to = auth.uid () THEN true
+        ELSE false
+    END as is_assigned,
     ta.created_at
 FROM
     public_v2._task_assignments ta
