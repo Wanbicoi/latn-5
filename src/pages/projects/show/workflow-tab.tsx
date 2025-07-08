@@ -124,10 +124,10 @@ export function WorkflowTab() {
           <Flex justify="space-between">
             <Space>
               <Button onClick={() => showMemberModal(project_id)}>
-                Choose Project Members
+                Choose project members
               </Button>
               <Button onClick={() => showDatasetsModal(project_id)}>
-                Choose Data for Annotate
+                Choose data for annotation
               </Button>
             </Space>
             <Popconfirm
@@ -153,7 +153,7 @@ export function WorkflowTab() {
                   />
                 }
               >
-                Choose Project Members
+                Choose project members
               </Button>
               <Button
                 onClick={() => showDatasetsModal(project_id)}
@@ -165,7 +165,7 @@ export function WorkflowTab() {
                   />
                 }
               >
-                Choose Data for Annotate
+                View data for annotation
               </Button>
             </Space>
             <IdDisplay
@@ -188,6 +188,7 @@ export function WorkflowTab() {
         <ChooseDataForAnnotate
           formProps={dataFormProps}
           dataModalProps={dataModalProps}
+          viewOnly={hasWorkflow}
         />
         <ChooseProjectMember
           formProps={memberFormProps}
@@ -198,17 +199,20 @@ export function WorkflowTab() {
   );
 }
 
-function ChooseDataForAnnotate({ formProps, dataModalProps }: any) {
+function ChooseDataForAnnotate({ formProps, dataModalProps, viewOnly }: any) {
   const { data: orthancResourceData } = useList({ resource: "resources" });
 
   return (
     <Modal
       {...dataModalProps}
       width={900}
-      title="Select data for the workflow"
+      title={
+        viewOnly ? "Data for the workflow" : "Select data for the workflow"
+      }
       okText="Done"
       cancelText="Cancel"
       destroyOnHidden
+      okButtonProps={viewOnly ? { disabled: true } : undefined}
     >
       <Form {...formProps} layout="vertical">
         <Form.Item
@@ -221,12 +225,7 @@ function ChooseDataForAnnotate({ formProps, dataModalProps }: any) {
             size="small"
             dataSource={orthancResourceData?.data}
             rowKey={"StudyInstanceUID"}
-            rowSelection={{
-              type: "checkbox",
-              selectedRowKeys: formProps?.values?.resources || [],
-              onChange: (selectedRowKeys) =>
-                formProps?.setFieldValue("resources", selectedRowKeys),
-            }}
+            disabled={viewOnly}
           >
             <Table.Column dataIndex="PatientID" title="Patient ID" />
             <Table.Column dataIndex="PatientName" title="Patient Name" />
@@ -241,11 +240,7 @@ function ChooseDataForAnnotate({ formProps, dataModalProps }: any) {
               dataIndex="StudyInstanceUID"
               render={(StudyInstanceUID) => (
                 <Tooltip title="Preview" placement="right">
-                  <Button
-                    type="link"
-                    icon={<EyeOutlined />}
-                    // Add preview logic here if needed
-                  />
+                  <Button type="link" icon={<EyeOutlined />} />
                 </Tooltip>
               )}
             />
