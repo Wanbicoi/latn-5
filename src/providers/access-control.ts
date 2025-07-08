@@ -5,35 +5,25 @@ import authProvider from "./auth-provider";
 export const accessControlProvider = (): Required<IAccessControlContext> => {
   return {
     can: async ({ resource, action }) => {
-      // Try to get permissions from local storage
-      const cachedPermissions = localStorage.getItem("resource_access");
-      let permissions;
+      const { authenticated } = await authProvider.check();
+      if (!authenticated) return { can: false };
 
-      if (cachedPermissions) {
-        // If permissions are in local storage, parse them
-        permissions = JSON.parse(cachedPermissions);
-      } else {
-        const { authenticated } = await authProvider.check();
-        if (!authenticated) return { can: false };
-
-        // Fetch permissions from the resource_access view for this user
-        const { data } = await supabaseClient
-          .from("resource_access")
-          .select("resource, action");
-        permissions = data ?? [];
-
-        // Store the permissions in local storage
-        localStorage.setItem("resource_access", JSON.stringify(permissions));
-      }
+      const { data } = await supabaseClient
+        .from("resource_access")
+        .select("resource, action")
+        .eq("resource", resource)
+        .eq("action", action)
+        .single();
 
       return {
-        can: permissions.some(
-          (permission: any) =>
-            permission.action == action && permission.resource == resource
-        ),
+        can: !!data,
       };
     },
     options: {
+      queryOptions: {
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        cacheTime: 1000 * 60 * 5, // 5 minutes
+      },
       buttons: {
         hideIfUnauthorized: false,
       },
