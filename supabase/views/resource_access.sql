@@ -25,5 +25,4 @@ FROM
             public_v2._resources r
         WHERE
             auth.jwt ()::JSON ->> 'email' = 'info@refine.dev'
-            AND resource != 'workflow'
     ) all_resources;

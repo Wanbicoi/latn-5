@@ -145,6 +145,7 @@ export function TasksTab() {
                   type="primary"
                   size="small"
                   icon={<EyeOutlined />}
+                  iconPosition="end"
                   onClick={() => openViewerForTask(record)}
                 >
                   View
