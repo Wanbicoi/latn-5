@@ -36,6 +36,12 @@ select
 select
     tests.create_supabase_user ('annotator@test.com');
 
+select
+    tests.create_supabase_user ('annotator2@test.com');
+
+select
+    tests.create_supabase_user ('annotator3@test.com');
+
 -- Authenticate as test user
 select
     tests.authenticate_as ('admin@test.com');
@@ -98,6 +104,18 @@ select
                 tests.get_supabase_uid ('annotator@test.com'),
                 'role_id',
                 '2d0ac3ac-abd8-4611-bd86-c90ec4d7271c' -- Annotator role
+            ),
+            JSONB_BUILD_OBJECT(
+                'id',
+                tests.get_supabase_uid ('annotator2@test.com'),
+                'role_id',
+                '2d0ac3ac-abd8-4611-bd86-c90ec4d7271c' -- Annotator role
+            ),
+            JSONB_BUILD_OBJECT(
+                'id',
+                tests.get_supabase_uid ('annotator3@test.com'),
+                'role_id',
+                '2d0ac3ac-abd8-4611-bd86-c90ec4d7271c' -- Annotator role
             )
         )
     );
@@ -106,8 +124,8 @@ select
 select
     results_eq (
         $$select JSONB_ARRAY_LENGTH(members)::BIGINT from public_v2.project_members where id = ( select id from test_project )$$,
-        $$SELECT 3::BIGINT$$,
-        '3 members should be added to the project'
+        $$SELECT 5::BIGINT$$,
+        '5 members should be added to the project'
     );
 
 -- Test: projects view returns the created project with correct name and description
@@ -254,24 +272,6 @@ SELECT
         )::TEXT
     );
 
-SELECT
-    diag (
-        'test_assignment assigned to: ',
-        (
-            select
-                assigned_to
-            from
-                public_v2._task_assignments
-            where
-                id = (
-                    select
-                        id
-                    from
-                        test_assignment
-                )
-        )::TEXT
-    );
-
 -- Check test_assignment is not null
 select
     results_ne (
@@ -329,7 +329,6 @@ select
                 join public_v2._task_assignments ta on t.id = ta.task_id
                 where ta.id = ( select id from test_assignment )
             )
-            order by ta.created_at desc
         $$,
         $$VALUES ('COMPLETED'::public_v2.assignment_status), ('COMPLETED'::public_v2.assignment_status), ('PENDING'::public_v2.assignment_status)$$,
         'First workflow_annotate_submit'
