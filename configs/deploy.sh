@@ -14,7 +14,7 @@ docker run -d --name orthanc \
 
 # Restart Nginx container
 docker rm -f nginx || true
-docker build -t custom-nginx -f "$REPO_DIR/Dockerfile.nginx" "$REPO_DIR"
+docker buildx build --load -t custom-nginx -f "$REPO_DIR/Dockerfile.nginx" "$REPO_DIR"
 docker run -d --name nginx \
   --network host \
   custom-nginx
