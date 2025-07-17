@@ -6,5 +6,6 @@
   "HttpServerEnabled": true,
   "HttpPort": 8042,
   "RemoteAccessAllowed": true,
-  "AuthenticationEnabled": false
+  "AuthenticationEnabled": false,
+  "HttpsVerifyPeers": false
 }
