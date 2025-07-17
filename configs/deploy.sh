@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # Use configs directly from the repo path
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
