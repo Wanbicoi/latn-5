@@ -14,10 +14,9 @@ docker run -d --name orthanc \
 
 # Restart Nginx container
 docker rm -f nginx || true
+docker build -t custom-nginx -f "$REPO_DIR/Dockerfile.nginx" "$REPO_DIR"
 docker run -d --name nginx \
-  -v "$REPO_DIR/nginx.conf":/etc/nginx/nginx.conf:ro \
-  -v /dev/null:/etc/nginx/conf.d/default.conf:ro \
   --network host \
-  nginx
+  custom-nginx
 
 echo "Deployment complete."
