@@ -1,6 +1,7 @@
 {
   "Name": "Orthanc",
   "StorageDirectory": "/var/lib/orthanc/db",
+  "Plugins": ["/usr/local/share/orthanc/plugins"],
   "LuaScripts": ["/etc/orthanc/lua/sync-public-ids.lua"],
   "HttpServerEnabled": true,
   "HttpPort": 8042,
