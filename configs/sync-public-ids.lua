@@ -18,7 +18,7 @@ function OnStableStudy(studyId, tags, metadata)
     body,
     {
       ["Content-Type"] = "application/json",
-      ["apikey"] = "",
+      ["apikey"] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtZWVtc2VlcXBuc3Fnd2RwY29qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4MjM0OTcsImV4cCI6MjA1OTM5OTQ5N30.qGfF6_6sw5K-9QzDOcwjE-XOpMb-q2D5HgxFRB8LcYA",
       ["Content-Profile"] = "public_v2",
     }
   )
@@ -31,7 +31,7 @@ function OnDeletedStudy(studyId)
     "https://bmeemseeqpnsqgwdpcoj.supabase.co/rest/v1/_datasource_integrations?orthanc_uuid=eq." .. studyId,
     {
       ["Content-Type"] = "application/json",
-      ["apikey"] = "",
+      ["apikey"] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtZWVtc2VlcXBuc3Fnd2RwY29qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4MjM0OTcsImV4cCI6MjA1OTM5OTQ5N30.qGfF6_6sw5K-9QzDOcwjE-XOpMb-q2D5HgxFRB8LcYA",
       ["Content-Profile"] = "public_v2",
     }
     )
