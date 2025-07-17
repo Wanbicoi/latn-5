@@ -7,5 +7,9 @@
   "HttpPort": 8042,
   "RemoteAccessAllowed": true,
   "AuthenticationEnabled": false,
-  "HttpsVerifyPeers": false
+  "HttpsVerifyPeers": false,
+  "DicomWeb": {
+    "Enabled": true,
+    "Root": "/dicom-web/"
+  }
 }
