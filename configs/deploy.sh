@@ -14,9 +14,9 @@ docker run -d --name orthanc \
 
 # Restart Nginx container
 docker rm -f nginx || true
-DOCKER_BUILDKIT=1 docker build --progress=plain --build-arg NGINX_VERSION=1.25-alpine -t custom-nginx -f "$REPO_DIR/Dockerfile.nginx" "$REPO_DIR"
 docker run -d --name nginx \
+  -v "$REPO_DIR/nginx.conf":/etc/nginx/nginx.conf:ro \
   --network host \
-  custom-nginx
+  nginx:1.25-alpine
 
 echo "Deployment complete."
