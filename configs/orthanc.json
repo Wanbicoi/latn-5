@@ -1,0 +1,13 @@
+{
+  "Name": "Orthanc",
+  "StorageDirectory": "/var/lib/orthanc/db",
+  "Plugins": ["/etc/orthanc/plugins", "/etc/orthanc/lua"],
+  "LuaScripts": ["/etc/orthanc/lua/sync-public-ids.lua"],
+  "HttpServerEnabled": true,
+  "HttpPort": 8042,
+  "RemoteAccessAllowed": true,
+  "AuthenticationEnabled": true,
+  "RegisteredUsers": {
+    "orthanc": "orthanc"
+  }
+}
