@@ -16,6 +16,7 @@ docker run -d --name orthanc \
 docker rm -f nginx || true
 docker run -d --name nginx \
   -v "$REPO_DIR/nginx.conf":/etc/nginx/nginx.conf:ro \
+  -v /dev/null:/etc/nginx/conf.d/default.conf:ro \
   -p 80:80 -p 443:443 nginx
 
 echo "Deployment complete."
