@@ -1,3 +1,5 @@
+# Ignore MONAI Label apps directory
+apps/
 .roo/
 .roo*
 
@@ -41,3 +43,9 @@ _.sln
 .env.*
 
 supabase/general.sql
+.aider*
+.env
+.env
+.env
+.env
+.env
