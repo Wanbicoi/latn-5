@@ -16,6 +16,7 @@ docker run -d --name orthanc \
 docker rm -f nginx || true
 docker run -d --name nginx \
   -v "$REPO_DIR/nginx.conf":/etc/nginx/nginx.conf:ro \
+  -v ~/certbot/conf:/etc/letsencrypt:ro \
   --network host \
   nginx:1.25-alpine
 
