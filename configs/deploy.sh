@@ -17,7 +17,7 @@ docker rm -f nginx || true
 docker run -d --name nginx \
   -v "$REPO_DIR/nginx.conf":/etc/nginx/nginx.conf:ro \
   -v ~/certbot/conf:/etc/letsencrypt:ro \
-  --network host \
+  -p 80:80 -p 443:443 \
   nginx:1.25-alpine
 
 echo "Deployment complete."
