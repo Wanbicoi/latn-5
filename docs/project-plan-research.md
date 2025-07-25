@@ -100,7 +100,7 @@ This platform is designed for flexibility, auditability, and scalability in data
 - Routing logic based on config.
 
 ### 5. Integrations
-- Datasource integration (Orthanc sync service, backend job or webhook).
+- Datasource integration (Orthanc sync service, backend job or webhook) and MONAI integration.
 - OHIF Viewer activities/review integration.
 
 ### 6. Platform & User Management
@@ -118,7 +118,7 @@ Below is a step-by-step, actionable timeline for implementation. Each step is se
 
 ### Project Setup & Foundation
 - Supabase project creation, PostgreSQL setup, initial migrations. Refine/Ant Design setup, project scaffolding, DevOps, CI/CD (1h)
-- Datasource integration (Orthanc sync service, backend job/webhook) (1h)
+- Datasource integration (Orthanc sync service, backend job/webhook) and MONAI integration (1h)
 - Setup reverse proxy for OHIF/Orthanc authentication (1h)
 
 ### Core Workflow & Engine

@@ -20,5 +20,6 @@ CREATE TYPE public_v2.stage_type AS ENUM(
     'MITL',
     'ROUTER',
     'SUCCESS',
-    'ARCHIVED'
+    'ARCHIVED',
+    'CONSENSUS_HOLDING'
 );

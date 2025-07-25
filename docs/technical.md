@@ -7,6 +7,7 @@ This document outlines the technical standards for the data annotation platform.
 - **Backend**: PostgreSQL on Supabase (Auth, Database, Real-time)
 - **Frontend**: React with [refine.dev](https://refine.dev/) and Ant Design
 - **Tooling**: Vite, and either npm or yarn
+- **Integrations**: OHIF Viewer, MONAI, and Orthanc are leveraged for advanced annotation workflows, medical imaging, and AI-assisted labeling.
 
 ## 2. Backend Development (Supabase)
 

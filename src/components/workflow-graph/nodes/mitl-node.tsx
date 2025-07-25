@@ -45,7 +45,7 @@ export const MitlNode: React.FC<MitlNodeProps> = ({ data, selected }) => {
           ],
         }}
       >
-        <SettingOutlined
+        {/* <SettingOutlined
           style={{
             position: "absolute",
             top: 8,
@@ -54,7 +54,7 @@ export const MitlNode: React.FC<MitlNodeProps> = ({ data, selected }) => {
             fontSize: 16,
           }}
           onClick={handleOpen}
-        />
+        /> */}
       </BaseNode>
       <Modal
         open={modalOpen}

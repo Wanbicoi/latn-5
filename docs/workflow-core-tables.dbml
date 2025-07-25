@@ -1,0 +1,87 @@
+Table _users {
+  id uuid [pk]
+  full_name text
+  avatar_url text
+  created_at timestamp
+  updated_at timestamp
+  is_system boolean
+  email text
+}
+
+Table _projects {
+  id uuid [pk]
+  name varchar
+  description text
+  created_by uuid
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table _workflows {
+  id uuid [pk]
+  created_at timestamp
+  project_id uuid
+  graph_data jsonb
+  begin_stage_id uuid
+}
+
+Table _workflow_stages {
+  id uuid [pk]
+  workflow_id uuid
+  type text
+  custom_config jsonb
+  on_success_stage_id uuid
+  on_failure_stage_id uuid
+  parent_stage_id uuid
+  handle_id text
+}
+
+Table _workflow_stage_connections {
+  source uuid [ref: > _workflow_stages.id]
+  target uuid [ref: > _workflow_stages.id]
+  source_handle varchar
+  created_at timestamp
+  primary key (source, target)
+}
+
+Table _workflow_stage_functions {
+  type text [pk]
+  get_assignees_uuids text
+}
+
+Table _tasks {
+  id uuid [pk]
+  data_item_id uuid
+  project_id uuid
+  completed_at timestamp
+  created_at timestamp
+  segmentation_ids jsonb
+  status text
+}
+
+Table _task_assignments {
+  id uuid [pk]
+  task_id uuid
+  stage_id uuid
+  assigned_to uuid
+  status text
+  created_at timestamp
+  started_at timestamp
+  stopped_at timestamp
+  previous_task_assignment_id uuid
+}
+
+Ref: _projects.created_by > _users.id
+Ref: _workflows.project_id > _projects.id
+Ref: _workflows.begin_stage_id > _workflow_stages.id
+Ref: _workflow_stages.workflow_id > _workflows.id
+Ref: _workflow_stages.parent_stage_id > _workflow_stages.id
+Ref: _workflow_stages.on_success_stage_id > _workflow_stages.id
+Ref: _workflow_stages.on_failure_stage_id > _workflow_stages.id
+Ref: _tasks.project_id > _projects.id
+Ref: _tasks.data_item_id > _datasource_integrations.id
+Ref: _task_assignments.task_id > _tasks.id
+Ref: _task_assignments.stage_id > _workflow_stages.id
+Ref: _task_assignments.assigned_to > _users.id
+Ref: _task_assignments.previous_task_assignment_id > _task_assignments.id

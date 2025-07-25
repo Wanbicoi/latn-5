@@ -71,6 +71,7 @@ The platform provides tools for managing users and their roles within projects.
 
 ## 5. Annotation & Collaboration
 The platform is designed to facilitate efficient and accurate data annotation through a collaborative environment.
+- **Integrated Annotation Tools**: The platform leverages OHIF Viewer, MONAI, and Orthanc for annotation workflows, supporting advanced medical imaging and AI-assisted labeling.
 
 - **Annotation Commenting**: Users can leave comments on task assignments, allowing for rich discussions and feedback. Comments can include structured data for detailed annotations.
 - **Data Source Integration**: The system can connect to external data sources, such as medical imaging archives (e.g., Orthanc), to pull in data items for annotation.

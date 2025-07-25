@@ -1,0 +1,13 @@
+service_display_name,name,quantity,region,service_id,sku,"total_price, USD",notes
+Instances (Compute Engine),N1 Predefined Instance Core running in Virginia,730.0,us-east4,6F81-5844-456A,2026-872A-3AB3,18.19416,
+Instances (Compute Engine),N1 Predefined Instance Ram running in Virginia,2737.5,us-east4,6F81-5844-456A,6E2A-DCD9-87ED,9.14243,
+Instances (Compute Engine),Nvidia Tesla T4 GPU running in Virginia,730.0,us-east4,6F81-5844-456A,8D8D-649C-0D7F,189.07,
+Instances (Compute Engine),Balanced PD Capacity in Virginia,10.0,us-east4,6F81-5844-456A,7D52-6D58-14FF,1.1,
+,,,,,,,
+,,,,,Total Price:,217.50658,
+,,,,,,,
+"Prices are in US dollars, effective date is 2025-07-20T13:55:51.896Z",,,,,,,
+,,,,,,,
+The estimated fees provided by Google Cloud Pricing Calculator are for discussion purposes only and are not binding on either you or Google. Your actual fees may be higher or lower than the estimate.,,,,,,,
+,,,,,,,
+Url to the estimate:,https://cloud.google.com/calculator?dl=CjhDaVF3Wm1ReFlUWmpPQzA0WkdaakxUUmhNRE10WVRkbE15MWtZbU0yT1dOaE5URXhNRE1RQWc9PRokRkI3MjU3RjItOEQxRS00NkUwLUE5QkMtRDhEQUJCNjlGQzY1,,,,,,
