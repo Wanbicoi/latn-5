@@ -132,7 +132,7 @@ export function WorkflowTab() {
             </Space>
             <Popconfirm
               placement="left"
-              title="Are you sure you want to delete this workflow?"
+              title="Are you sure you want to create this workflow?"
               onConfirm={handleSave}
               okText="Yes"
               cancelText="No"
