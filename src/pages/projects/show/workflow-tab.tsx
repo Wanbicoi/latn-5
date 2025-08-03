@@ -201,7 +201,12 @@ export function WorkflowTab() {
 }
 
 function ChooseDataForAnnotate({ formProps, dataModalProps, viewOnly }: any) {
-  const { data: orthancResourceData } = useList({ resource: "resources" });
+  const { data: orthancResourceData } = useList({
+    resource: "resources",
+    pagination: {
+      mode: "off",
+    },
+  });
 
   return (
     <Modal
@@ -254,8 +259,18 @@ function ChooseDataForAnnotate({ formProps, dataModalProps, viewOnly }: any) {
   );
 }
 function ChooseProjectMember({ formProps, memberModalProps, viewOnly }: any) {
-  const { data: membersData } = useList({ resource: "members" });
-  const { data: rolesData } = useList({ resource: "roles" });
+  const { data: membersData } = useList({
+    resource: "members",
+    pagination: {
+      mode: "off",
+    },
+  });
+  const { data: rolesData } = useList({
+    resource: "roles",
+    pagination: {
+      mode: "off",
+    },
+  });
 
   return (
     <Modal
