@@ -27,6 +27,12 @@ export const ProjectsList = () => {
         />
         <Table.Column dataIndex="name" title="Name" />
         <Table.Column
+          title="Total tasks"
+          dataIndex="tasks_count"
+          align="center"
+          render={(value: number) => value ?? 0}
+        />
+        <Table.Column
           title="Tags"
           dataIndex="tags"
           render={(tags: any[]) => (

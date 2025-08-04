@@ -11,16 +11,18 @@ SELECT
     p.created_at,
     p.updated_at,
     COALESCE(
-        ARRAY_AGG(t.id) FILTER (
+        ARRAY_AGG(DISTINCT t.id) FILTER (
             WHERE
                 t.id IS NOT NULL
         ),
         ARRAY[]::bigint[]
-    ) AS tags
+    ) AS tags,
+    COUNT(DISTINCT tk.id) AS tasks_count
 FROM
     public_v2._projects p
     LEFT JOIN public_v2._project_to_tags pt ON pt.project_id = p.id
     LEFT JOIN public_v2._project_tags t ON t.id = pt.tag_id
+    LEFT JOIN public_v2._tasks tk ON tk.project_id = p.id
     LEFT JOIN public_v2.resource_access ra_list ON ra_list.resource = 'projects'
     AND ra_list.action = 'list'
     LEFT JOIN public_v2.projects_resource_access ra_list_joined ON ra_list_joined.resource = 'projects'
