@@ -1,5 +1,14 @@
 import { UserAvatar } from "@/components/avatar";
-import { Bar } from "@ant-design/plots";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 import { useList, useParsed } from "@refinedev/core";
 import { Card, Col, Row, Space, Statistic, Table } from "antd";
 
@@ -11,33 +20,36 @@ export function AssigneeMetricsTab() {
     filters: [{ field: "project_id", operator: "eq", value: projectId }],
   });
 
-  const performanceData: {
+  interface AssigneeMetrics {
     assignee_avatar_url: string;
     assignee_name: string;
     total_tasks_completed: number;
     total_duration_seconds: number;
-    avg_duration_seconds: number;
-  }[] = (data?.data as any) || [];
+    avg_task_duration_seconds: number;
+    dataset_count: number;
+    avg_dataset_duration_seconds: number;
+    project_total_tasks_completed: number;
+    project_total_duration_seconds: number;
+    project_total_dataset_count: number;
+    project_avg_task_duration_seconds: number;
+    project_avg_dataset_duration_seconds: number;
+  }
 
-  // Calculate overall project stats
-  const totalTasks = performanceData.reduce(
-    (sum, item) => sum + item.total_tasks_completed,
-    0
-  );
+  const performanceData: AssigneeMetrics[] = (data?.data as any) || [];
+
+  // Get project stats from first row (all rows have same project totals)
+  const projectStats = performanceData[0];
   const totalAssignees = performanceData.length;
-  const totalDuration = performanceData.reduce(
-    (sum, item) => sum + item.total_duration_seconds,
-    0
-  );
-  const avgTaskTime = totalTasks > 0 ? totalDuration / totalTasks : 0;
 
-  const barChartConfig = {
-    data: performanceData,
-    xField: "total_duration_seconds",
-    yField: "assignee_name",
-    seriesField: "assignee_name",
-    legend: { position: "top-left" },
+  const formatSecondsToHMS = (totalSeconds: number) => {
+    const secondsInt = Math.round(totalSeconds || 0);
+    const hours = Math.floor(secondsInt / 3600);
+    const minutes = Math.floor((secondsInt % 3600) / 60);
+    const seconds = secondsInt % 60;
+    return `${hours}h ${minutes}m ${seconds}s`;
   };
+
+  // Recharts-based vertical bar chart config is expressed via JSX below
 
   const columns = [
     {
@@ -52,43 +64,78 @@ export function AssigneeMetricsTab() {
     },
     { title: "Tasks Completed", dataIndex: "total_tasks_completed" },
     {
-      title: "Total Time (minutes)",
+      title: "Total Time",
       dataIndex: "total_duration_seconds",
-      render: (seconds: number) => (seconds / 60).toFixed(2),
+      render: (seconds: number) => formatSecondsToHMS(seconds),
     },
     {
-      title: "Avg. Time per Task (seconds)",
-      dataIndex: "avg_duration_seconds",
-      render: (seconds: number) => seconds.toFixed(2),
+      title: "Avg. Time per Task",
+      dataIndex: "avg_task_duration_seconds",
+      render: (seconds: number) => formatSecondsToHMS(seconds),
+    },
+    {
+      title: "Total Image Sets",
+      dataIndex: "dataset_count",
+      render: (val: number) => val ?? 0,
+    },
+    {
+      title: "Avg. Time per Image Set",
+      dataIndex: "avg_dataset_duration_seconds",
+      render: (seconds: number) => formatSecondsToHMS(seconds),
     },
   ];
 
   return (
     <>
       <Row gutter={16}>
-        <Col span={6}>
+        <Col span={4}>
           <Card>
             <Statistic title="Total Assignees" value={totalAssignees} />
           </Card>
         </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic title="Tasks Completed" value={totalTasks} />
-          </Card>
-        </Col>
-        <Col span={6}>
+        <Col span={4}>
           <Card>
             <Statistic
-              title="Total Time (hours)"
-              value={(totalDuration / 3600).toFixed(2)}
+              title="Tasks Completed"
+              value={projectStats?.project_total_tasks_completed || 0}
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col span={4}>
           <Card>
             <Statistic
-              title="Avg. Task Time (minutes)"
-              value={(avgTaskTime / 60).toFixed(2)}
+              title="Total Time (h)"
+              value={(
+                (projectStats?.project_total_duration_seconds || 0) / 3600
+              ).toFixed(2)}
+            />
+          </Card>
+        </Col>
+        <Col span={4}>
+          <Card>
+            <Statistic
+              title="Avg. Task Time (m)"
+              value={(
+                (projectStats?.project_avg_task_duration_seconds || 0) / 60
+              ).toFixed(2)}
+            />
+          </Card>
+        </Col>
+        <Col span={4}>
+          <Card>
+            <Statistic
+              title="Total Image Sets"
+              value={projectStats?.project_total_dataset_count || 0}
+            />
+          </Card>
+        </Col>
+        <Col span={4}>
+          <Card>
+            <Statistic
+              title="Avg. Image Set Time (m)"
+              value={(
+                (projectStats?.project_avg_dataset_duration_seconds || 0) / 60
+              ).toFixed(2)}
             />
           </Card>
         </Col>
@@ -96,8 +143,37 @@ export function AssigneeMetricsTab() {
 
       <Row gutter={16} style={{ marginTop: "24px" }}>
         <Col span={24}>
-          <Card title="Time Spent per Assignee (seconds)">
-            <Bar {...barChartConfig} />
+          <Card title="Time Spent per Assignee">
+            <div style={{ width: "100%", height: 360 }}>
+              <ResponsiveContainer>
+                <BarChart
+                  data={performanceData}
+                  layout="vertical"
+                  margin={{ top: 16, right: 24, bottom: 16, left: 24 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    type="number"
+                    tickFormatter={(sec: number) =>
+                      `${(sec / 3600).toFixed(1)}h`
+                    }
+                  />
+                  <YAxis type="category" dataKey="assignee_name" width={150} />
+                  <Tooltip
+                    formatter={(value: number) => [
+                      formatSecondsToHMS(Number(value)),
+                      "Total Time",
+                    ]}
+                  />
+                  <Legend />
+                  <Bar
+                    dataKey="total_duration_seconds"
+                    name="Total Time"
+                    fill="#8884d8"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </Card>
         </Col>
       </Row>
