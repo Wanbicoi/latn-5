@@ -59,8 +59,8 @@ docker run --rm \
   -v ~/certbot/conf:/etc/letsencrypt \
   -v ~/certbot/www:/var/www/certbot \
   certbot/certbot certonly --standalone \
-  -d mediflow-latn.duckdns.org \
-  --non-interactive --agree-tos -m admin@mediflow-latn.duckdns.org
+  -d mediflow.freemyip.com \
+  --non-interactive --agree-tos -m admin@mediflow.freemyip.com
 ```
 The certificates will be saved in `~/certbot/conf`.
 
