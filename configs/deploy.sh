@@ -15,14 +15,11 @@ docker run -d --name orthanc --network latn-net \
   -v "$REPO_DIR/orthanc-db":/var/lib/orthanc/db \
   -p 8042:8042 -p 4242:4242 jodogne/orthanc-plugins:1.12.8
 
-# Restart Nginx container
-docker rm -f nginx || true
-docker run -d --name nginx --network latn-net \
-  -v "$REPO_DIR/nginx.conf":/etc/nginx/nginx.conf:ro \
-  -v ~/certbot/conf:/etc/letsencrypt:ro \
+# Restart Caddy container
+docker rm -f caddy || true
+docker run -d --name caddy --network latn-net \
+  -v "$REPO_DIR/Caddyfile":/etc/caddy/Caddyfile:ro \
   -p 80:80 -p 443:443 \
-  nginx:1.25-alpine
+  caddy:2-alpine
 
 echo "Deployment complete."
-
-curl https://freemyip.com/update?token=98c8d79f456288d3d2c3b68f&domain=mediflow.freemyip.com&verbose=yes
