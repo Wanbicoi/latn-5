@@ -24,3 +24,5 @@ docker run -d --name nginx --network latn-net \
   nginx:1.25-alpine
 
 echo "Deployment complete."
+
+curl https://freemyip.com/update?token=98c8d79f456288d3d2c3b68f&domain=mediflow.freemyip.com&verbose=yes
