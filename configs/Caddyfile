@@ -1,44 +1,55 @@
 mediflow.freemyip.com {
   encode gzip
 
+  # HTTP to HTTPS redirect
   @http {
     protocol http
   }
   redir @http https://{host}{uri}
 
-  reverse_proxy /monai/* http://120.238.149.138:57180 {
-    header_up Host {host}
-    header_up X-Real-IP {remote_host}
-    header_up X-Forwarded-For {remote_host}
-    header_up X-Forwarded-Proto {scheme}
-  }
-
-  reverse_proxy /ohif3/* https://latn-3-ohif3.pages.dev {
-    header_up Host {host}
-    header_up X-Real-IP {remote_host}
-    header_up X-Forwarded-For {remote_host}
-    header_up X-Forwarded-Proto {scheme}
-  }
-
-  reverse_proxy /datasource/* http://orthanc:8042 {
-    header_up Host {host}
+  # Datasource/Orthanc proxy
+  @datasource path /datasource/*
+  reverse_proxy @datasource http://orthanc:8042 {
+    # Remove Host header - let it use orthanc:8042
     header_up X-Real-IP {remote_host}
     header_up X-Forwarded-For {remote_host}
     header_up X-Forwarded-Proto {scheme}
     header_up Connection {>Connection}
     header_up Upgrade {>Upgrade}
-    header_down Access-Control-Allow-Origin *
-    header_down Cache-Control private
-    header_down Expires 0
-    header_down Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
-    header_down Access-Control-Allow-Headers "Authorization,Content-Type,Accept,Origin,X-Requested-With"
-    header_down Access-Control-Max-Age 1728000
   }
 
-  reverse_proxy /* https://latn-5.pages.dev {
-    header_up Host {host}
+  # OHIF viewer proxy
+  @ohif path /ohif3/*
+  reverse_proxy @ohif https://latn-3-ohif3.pages.dev {
+    # Remove Host header - let it use the upstream host
     header_up X-Real-IP {remote_host}
     header_up X-Forwarded-For {remote_host}
     header_up X-Forwarded-Proto {scheme}
+  }
+
+  # Default proxy
+  reverse_proxy https://latn-5.pages.dev {
+    # Remove Host header - let it use the upstream host
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+
+  # Global headers
+  header {
+    # Consider restricting CORS to specific domains
+    Access-Control-Allow-Origin *
+    Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+    Access-Control-Allow-Headers "Authorization, Content-Type, Accept, Origin, X-Requested-With"
+    Access-Control-Max-Age 1728000
+    
+    # Security headers
+    X-Content-Type-Options nosniff
+    X-Frame-Options DENY
+    X-XSS-Protection "1; mode=block"
+    
+    # Cache control - consider path-specific caching
+    Cache-Control "private, no-cache"
+    Expires 0
   }
 }
