@@ -7,8 +7,6 @@ mediflow.freemyip.com {
     reverse_proxy https://latn-3-ohif3.pages.dev {
       # No buffering
       flush_interval -1
-      # No caching
-      header_up Cache-Control no-cache
       # SSL server name indication
       header_up Host latn-3-ohif3.pages.dev
     }
@@ -17,16 +15,20 @@ mediflow.freemyip.com {
   # Datasource/Orthanc proxy
   handle_path /datasource/* {
     reverse_proxy http://orthanc:8042 {
-      # HTTP/1.1 is default in Caddy
       # No buffering
       flush_interval -1
-      # Read timeout
-      timeout 300s
       # Headers
       header_up Host {host}
       header_up X-Real-IP {remote_host}
       header_up X-Forwarded-For {remote_host}
       header_up X-Forwarded-Proto {scheme}
+      
+      # Timeouts
+      transport http {
+        read_timeout 300s
+        write_timeout 300s
+        dial_timeout 30s
+      }
     }
 
     # Response headers
@@ -55,16 +57,10 @@ mediflow.freemyip.com {
   # Default location (root)
   handle {
     reverse_proxy https://latn-5.pages.dev {
-      # No caching
-      header_up Cache-Control no-cache
       # No buffering
       flush_interval -1
       # SSL server name indication
       header_up Host latn-5.pages.dev
     }
   }
-
-  # Global settings
-  # TLS protocols (Caddy uses TLS 1.2 and 1.3 by default)
-  # High security ciphers are default in Caddy
 }
