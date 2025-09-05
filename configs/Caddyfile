@@ -7,10 +7,9 @@ mediflow.freemyip.com {
   }
   redir @http https://{host}{uri}
 
-  # Datasource/Orthanc proxy
-  @datasource path /datasource/*
+  # Datasource/Orthanc proxy (match both /datasource and /datasource/*)
+  @datasource path /datasource /datasource/*
   reverse_proxy @datasource http://orthanc:8042 {
-    # Remove Host header - let it use orthanc:8042
     header_up X-Real-IP {remote_host}
     header_up X-Forwarded-For {remote_host}
     header_up X-Forwarded-Proto {scheme}
@@ -18,10 +17,9 @@ mediflow.freemyip.com {
     header_up Upgrade {>Upgrade}
   }
 
-  # OHIF viewer proxy
-  @ohif path /ohif3/*
+  # OHIF viewer proxy (match both /ohif3 and /ohif3/*)
+  @ohif path /ohif3 /ohif3/*
   reverse_proxy @ohif https://latn-3-ohif3.pages.dev {
-    # Remove Host header - let it use the upstream host
     header_up X-Real-IP {remote_host}
     header_up X-Forwarded-For {remote_host}
     header_up X-Forwarded-Proto {scheme}
@@ -29,7 +27,6 @@ mediflow.freemyip.com {
 
   # Default proxy
   reverse_proxy https://latn-5.pages.dev {
-    # Remove Host header - let it use the upstream host
     header_up X-Real-IP {remote_host}
     header_up X-Forwarded-For {remote_host}
     header_up X-Forwarded-Proto {scheme}
@@ -37,18 +34,15 @@ mediflow.freemyip.com {
 
   # Global headers
   header {
-    # Consider restricting CORS to specific domains
     Access-Control-Allow-Origin *
     Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
     Access-Control-Allow-Headers "Authorization, Content-Type, Accept, Origin, X-Requested-With"
     Access-Control-Max-Age 1728000
-    
-    # Security headers
+
     X-Content-Type-Options nosniff
     X-Frame-Options DENY
     X-XSS-Protection "1; mode=block"
-    
-    # Cache control - consider path-specific caching
+
     Cache-Control "private, no-cache"
     Expires 0
   }
