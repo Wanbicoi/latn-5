@@ -1,4 +1,4 @@
-mediflow.freemyip.com {
+selab.edu {
   # Enable gzip compression
   encode gzip
 
